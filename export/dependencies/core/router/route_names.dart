@@ -33,9 +33,6 @@ abstract final class RouteNames {
 
   // SUCCESS
   static const String success = 'success';
-
-  // ORDER
-  static const String orderConfirmation = 'orderConfirmation';
 }
 
 abstract final class RoutePaths {
@@ -73,9 +70,5 @@ abstract final class RoutePaths {
   // Success
   static const String success = '/success';
 
-  // Order
-  static const String orderConfirmation = '/order/:id';
-
   static String medicineDetailsFor(String id) => '/medicine/$id';
-  static String orderConfirmationFor(String id) => '/order/$id';
 }

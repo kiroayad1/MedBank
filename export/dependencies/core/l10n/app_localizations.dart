@@ -84,6 +84,7 @@ class S {
     'requestMedicineTitle': {'en': 'Request Medicine', 'ar': 'طلب دواء'},
     'continueToRequest': {'en': 'Continue to Request', 'ar': 'المتابعة للطلب'},
     'requestDetails': {'en': 'Request Details', 'ar': 'تفاصيل الطلب'},
+    'prescriptionDate': {'en': 'Prescription Date', 'ar': 'تاريخ الوصفة'},
     'contactNumber': {'en': 'Contact Number', 'ar': 'رقم التواصل'},
     'deliveryLocation': {'en': 'Delivery/Pickup Location', 'ar': 'موقع التوصيل/الاستلام'},
 
@@ -177,6 +178,8 @@ class S {
 
     // ── Request Form ──
     'requestFormInfo': {'en': 'Please provide accurate details for the medicine you are requesting. This helps us match your request with available donations quickly.', 'ar': 'يرجى تقديم تفاصيل دقيقة للدواء الذي تطلبه. هذا يساعدنا في مطابقة طلبك مع التبرعات المتاحة بسرعة.'},
+    'prescriptionDateRequired': {'en': 'Prescription Date *', 'ar': 'تاريخ الوصفة *'},
+    'prescriptionNote': {'en': 'Required to verify ongoing medical need.', 'ar': 'مطلوب للتحقق من الحاجة الطبية المستمرة.'},
     'contactRequired': {'en': 'Contact Number *', 'ar': 'رقم التواصل *'},
     'deliveryRequired': {'en': 'Delivery/Pickup Location *', 'ar': 'موقع التوصيل/الاستلام *'},
 
@@ -273,14 +276,6 @@ class S {
     'catAntibioticsGrid': {'en': 'Antibiotics', 'ar': 'مضادات حيوية'},
     'catBloodPressure': {'en': 'Blood Pressure', 'ar': 'ضغط الدم'},
     'catSkinCare': {'en': 'Skin Care', 'ar': 'العناية بالبشرة'},
-
-    // ── Order Confirmation ──
-    'orderList': {'en': 'Order List', 'ar': 'قائمة الطلب'},
-    'medicinesOriginalPrice': {'en': 'Medicines Original Price', 'ar': 'السعر الأصلي للأدوية'},
-    'shippingFees': {'en': 'Shipping Fees', 'ar': 'رسوم الشحن'},
-    'totalToPay': {'en': 'Total To Pay', 'ar': 'الإجمالي للدفع'},
-    'confirmOrder': {'en': 'Confirm Order', 'ar': 'تأكيد الطلب'},
-    'egp': {'en': 'EGP', 'ar': 'ج.م'},
   };
 
   String _t(String key) {
@@ -441,6 +436,8 @@ class S {
 
   // Request Form
   String get requestFormInfo => _t('requestFormInfo');
+  String get prescriptionDateRequired => _t('prescriptionDateRequired');
+  String get prescriptionNote => _t('prescriptionNote');
   String get contactRequired => _t('contactRequired');
   String get deliveryRequired => _t('deliveryRequired');
 
@@ -534,14 +531,6 @@ class S {
   String get catAntibioticsGrid => _t('catAntibioticsGrid');
   String get catBloodPressure => _t('catBloodPressure');
   String get catSkinCare => _t('catSkinCare');
-
-  // Order Confirmation
-  String get orderList => _t('orderList');
-  String get medicinesOriginalPrice => _t('medicinesOriginalPrice');
-  String get shippingFees => _t('shippingFees');
-  String get totalToPay => _t('totalToPay');
-  String get confirmOrder => _t('confirmOrder');
-  String get egp => _t('egp');
 }
 
 /// Delegate for loading [S] localizations.

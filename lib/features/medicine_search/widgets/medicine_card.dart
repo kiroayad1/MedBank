@@ -43,9 +43,11 @@ class MedicineCard extends StatelessWidget {
               width: 0.5,
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+          child: SingleChildScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
               // ── Name + Availability Badge ──
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,7 +106,8 @@ class MedicineCard extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ),
+  );
 
     if (heroTag != null) {
       return Hero(tag: heroTag!, child: card);

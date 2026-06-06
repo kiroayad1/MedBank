@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +10,18 @@ import '../../../shared/widgets/app_text_field.dart';
 
 /// Request Form screen matching reference design.
 class RequestFormScreen extends StatefulWidget {
-  const RequestFormScreen({super.key});
+  final String? imagePath;
+  final String? initialName;
+  final String? initialCategory;
+  final String? initialUnit;
+
+  const RequestFormScreen({
+    super.key,
+    this.imagePath,
+    this.initialName,
+    this.initialCategory,
+    this.initialUnit,
+  });
 
   @override
   State<RequestFormScreen> createState() => _RequestFormScreenState();
@@ -25,8 +37,17 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
 
   String? _category;
   String? _unit;
-  DateTime? _prescDate;
   bool _isLoading = false;
+  String? _imagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _imagePath = widget.imagePath;
+    _nameCtrl.text = widget.initialName ?? '';
+    _category = widget.initialCategory;
+    _unit = widget.initialUnit;
+  }
 
   @override
   void dispose() {
@@ -36,16 +57,6 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
     _contactCtrl.dispose();
     _locationCtrl.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime.now(),
-    );
-    if (picked != null) setState(() => _prescDate = picked);
   }
 
   Future<void> _submit() async {
@@ -87,41 +98,76 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
                 style: AppTypography.bodySmall.copyWith(color: colors.onSurfaceVariant),
               ),
             ),
+            
+            if (_imagePath != null)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+                child: ClipRRect(
+                  borderRadius: AppShapes.borderRadiusMd,
+                  child: Stack(
+                    children: [
+                      Image.file(
+                        File(_imagePath!),
+                        height: 200,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                      Positioned(
+                        top: 8, right: 8,
+                        child: CircleAvatar(
+                          backgroundColor: Colors.black54,
+                          child: IconButton(
+                            icon: const Icon(Icons.close, color: Colors.white),
+                            onPressed: () => setState(() => _imagePath = null),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
             Padding(
               padding: const EdgeInsets.all(24),
               child: Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    AppTextField(
-                      controller: _nameCtrl, label: l.medicineNameRequired,
-                      hint: l.hintMedicineWithDose,
-                      prefixIcon: Icons.medication_outlined,
-                      validator: (v) => v == null || v.trim().isEmpty ? l.required : null,
-                    ),
+                    // Automatically fill name and make read-only if provided
+                    if (widget.initialName == null)
+                      AppTextField(
+                        controller: _nameCtrl, label: l.medicineNameRequired,
+                        hint: l.hintMedicineWithDose,
+                        prefixIcon: Icons.medication_outlined,
+                        validator: (v) => v == null || v.trim().isEmpty ? l.required : null,
+                      )
+                    else
+                      _readonlyField(l.medicineName, _nameCtrl.text, Icons.medication_outlined),
+                    
                     const SizedBox(height: AppSpacing.formFieldGap),
-                    _dropdown(l.category, _category, l.selectCategory,
-                        l.formCategories, (v) => setState(() => _category = v),
-                        prefixIcon: Icons.category_outlined),
+                    
+                    if (widget.initialCategory == null)
+                      _dropdown(l.category, _category, l.selectCategory,
+                          l.formCategories, (v) => setState(() => _category = v),
+                          prefixIcon: Icons.category_outlined)
+                    else
+                      _readonlyField(l.category, _category!, Icons.category_outlined),
+
                     const SizedBox(height: AppSpacing.formFieldGap),
                     Row(children: [
                       Expanded(child: AppTextField(
-                        controller: _qtyCtrl, label: l.quantityRequired, hint: '5',
+                        controller: _qtyCtrl, label: l.quantityRequired, hint: '1',
                         keyboardType: TextInputType.number,
                         validator: (v) => v == null || v.trim().isEmpty ? l.required : null,
                       )),
                       AppSpacing.gapHLg,
-                      Expanded(child: _dropdown(l.unitRequired, _unit, l.unitTablets,
-                          l.formUnits, (v) => setState(() => _unit = v))),
+                      Expanded(
+                        child: widget.initialUnit == null 
+                          ? _dropdown(l.unitRequired, _unit, l.unitTablets,
+                              l.formUnits, (v) => setState(() => _unit = v))
+                          : _readonlyField(l.unitRequired, _unit!, null)
+                      ),
                     ]),
-                    const SizedBox(height: AppSpacing.formFieldGap),
-                    _dateField(l.prescriptionDateRequired, _prescDate, _pickDate),
-                    AppSpacing.gapXs,
-                    Align(
-                      alignment: AlignmentDirectional.centerStart,
-                      child: Text(l.prescriptionNote,
-                          style: AppTypography.bodySmall.copyWith(color: AppColors.accent)),
-                    ),
                     const SizedBox(height: AppSpacing.formFieldGap),
                     AppTextField(
                       controller: _mfgCtrl, label: l.manufacturerOptional,
@@ -159,6 +205,35 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
     );
   }
 
+  Widget _readonlyField(String label, String value, IconData? icon) {
+    final colors = Theme.of(context).colorScheme;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: AppTypography.titleSmall.copyWith(color: colors.onSurface)),
+        AppSpacing.gapSm,
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          decoration: BoxDecoration(
+            color: colors.surfaceContainerHighest.withAlpha(77), // ~0.3 opacity
+            borderRadius: AppShapes.borderRadiusMd,
+            border: Border.all(color: colors.outlineVariant.withAlpha(128)), // ~0.5 opacity
+          ),
+          child: Row(
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 20, color: colors.onSurfaceVariant),
+                const SizedBox(width: 12),
+              ],
+              Text(value, style: AppTypography.bodyLarge.copyWith(color: colors.onSurface)),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _dropdown(String label, String? value, String hint, List<String> items,
       ValueChanged<String?> onChanged, {IconData? prefixIcon}) {
     final colors = Theme.of(context).colorScheme;
@@ -166,30 +241,11 @@ class _RequestFormScreenState extends State<RequestFormScreen> {
       Text(label, style: AppTypography.titleSmall.copyWith(color: colors.onSurface)),
       AppSpacing.gapSm,
       DropdownButtonFormField<String>(
-        initialValue: value, hint: Text(hint),
+        value: value, hint: Text(hint),
         icon: Icon(Icons.keyboard_arrow_down_rounded, color: colors.onSurfaceVariant),
         decoration: InputDecoration(prefixIcon: prefixIcon != null ? Icon(prefixIcon, size: 20) : null),
         items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
         onChanged: onChanged,
-      ),
-    ]);
-  }
-
-  Widget _dateField(String label, DateTime? value, VoidCallback onTap) {
-    final colors = Theme.of(context).colorScheme;
-    final l = context.l10n;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: AppTypography.titleSmall.copyWith(color: colors.onSurface)),
-      AppSpacing.gapSm,
-      InkWell(
-        onTap: onTap, borderRadius: AppShapes.borderRadiusMd,
-        child: InputDecorator(
-          decoration: const InputDecoration(prefixIcon: Icon(Icons.calendar_today_outlined, size: 18)),
-          child: Text(
-            value != null ? '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}' : l.hintDateFormat,
-            style: AppTypography.bodyLarge.copyWith(color: value != null ? colors.onSurface : colors.onSurfaceVariant),
-          ),
-        ),
       ),
     ]);
   }

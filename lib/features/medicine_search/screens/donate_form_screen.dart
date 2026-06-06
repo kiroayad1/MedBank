@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/router/route_names.dart';
@@ -9,7 +11,8 @@ import '../../../shared/widgets/app_text_field.dart';
 
 /// Donate Form screen matching reference design.
 class DonateFormScreen extends StatefulWidget {
-  const DonateFormScreen({super.key});
+  final String? imagePath;
+  const DonateFormScreen({super.key, this.imagePath});
 
   @override
   State<DonateFormScreen> createState() => _DonateFormScreenState();
@@ -24,6 +27,13 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
   String? _category, _unit, _condition;
   DateTime? _expiry;
   bool _isLoading = false;
+  String? _imagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _imagePath = widget.imagePath;
+  }
 
   @override
   void dispose() {
@@ -32,6 +42,59 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
     _mfgCtrl.dispose();
     _locCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picker = ImagePicker();
+    try {
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+      if (image != null) {
+        setState(() => _imagePath = image.path);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error picking image')),
+        );
+      }
+    }
+  }
+
+  void _showImageSourceSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_rounded),
+              title: const Text('Camera'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded),
+              title: const Text('Gallery'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _pickDate() async {
@@ -86,6 +149,57 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
                 )),
               ]),
             ),
+
+            // Image Picker Section
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 0),
+              child: InkWell(
+                onTap: _showImageSourceSheet,
+                borderRadius: AppShapes.borderRadiusLg,
+                child: Container(
+                  height: 180,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.cardDark : AppColors.cardLight,
+                    borderRadius: AppShapes.borderRadiusLg,
+                    border: Border.all(
+                      color: colors.primary.withValues(alpha: 0.2),
+                      style: _imagePath == null ? BorderStyle.solid : BorderStyle.none,
+                    ),
+                  ),
+                  child: _imagePath != null
+                      ? Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            ClipRRect(
+                              borderRadius: AppShapes.borderRadiusLg,
+                              child: Image.file(File(_imagePath!), fit: BoxFit.cover),
+                            ),
+                            Positioned(
+                              top: 8, right: 8,
+                              child: CircleAvatar(
+                                backgroundColor: Colors.black54,
+                                radius: 18,
+                                child: IconButton(
+                                  icon: const Icon(Icons.edit, size: 16, color: Colors.white),
+                                  onPressed: _showImageSourceSheet,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.add_a_photo_outlined, size: 40, color: colors.primary),
+                            AppSpacing.gapSm,
+                            Text(l.withMedicineImage, style: AppTypography.titleSmall.copyWith(color: colors.primary)),
+                          ],
+                        ),
+                ),
+              ),
+            ),
+
             Padding(
               padding: const EdgeInsets.all(24),
               child: Container(
@@ -148,7 +262,7 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
       Text(label, style: AppTypography.titleSmall.copyWith(color: colors.onSurface)),
       AppSpacing.gapSm,
       DropdownButtonFormField<String>(
-        initialValue: val, hint: Text(hint),
+        value: val, hint: Text(hint),
         icon: Icon(Icons.keyboard_arrow_down_rounded, color: colors.onSurfaceVariant),
         items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
         onChanged: onChanged,

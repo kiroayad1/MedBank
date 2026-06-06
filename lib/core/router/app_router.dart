@@ -2,23 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/providers/auth_provider.dart';
-import '../../features/auth/screens/login_screen.dart';
-import '../../features/auth/screens/sign_up_screen.dart';
-import '../../features/auth/screens/forgot_password_screen.dart';
-import '../../features/auth/screens/create_password_screen.dart';
-import '../../features/auth/screens/profile_screen.dart';
-import '../../features/auth/screens/edit_profile_screen.dart';
-import '../../features/auth/screens/settings_screen.dart';
-import '../../features/medicine_search/screens/browse_screen.dart';
-import '../../features/medicine_search/screens/donate_guidelines_screen.dart';
-import '../../features/medicine_search/screens/donate_form_screen.dart';
-import '../../features/medicine_search/screens/request_guidelines_screen.dart';
-import '../../features/medicine_search/screens/request_form_screen.dart';
-import '../../features/medicine_search/screens/category_medicines_screen.dart';
-import '../../features/medicine_details/screens/medicine_details_screen.dart';
-import '../../features/saved_medicines/screens/my_activity_list_screen.dart';
 import '../l10n/app_localizations.dart';
+import '../../features/auth/providers/auth_provider.dart';
+import '../../features/auth/screens/create_password_screen.dart';
+import '../../features/auth/screens/edit_profile_screen.dart';
+import '../../features/auth/screens/forgot_password_screen.dart';
+import '../../features/auth/screens/login_screen.dart';
+import '../../features/auth/screens/profile_screen.dart';
+import '../../features/auth/screens/settings_screen.dart';
+import '../../features/auth/screens/sign_up_screen.dart';
+import '../../features/medicine_details/screens/medicine_details_screen.dart';
+import '../../features/medicine_details/screens/order_confirmation_screen.dart';
+import '../../features/medicine_search/screens/browse_screen.dart';
+import '../../features/medicine_search/screens/category_medicines_screen.dart';
+import '../../features/medicine_search/screens/donate_form_screen.dart';
+import '../../features/medicine_search/screens/donate_guidelines_screen.dart';
+import '../../features/medicine_search/screens/request_form_screen.dart';
+import '../../features/medicine_search/screens/request_guidelines_screen.dart';
+import '../../features/saved_medicines/screens/my_activity_list_screen.dart';
 import '../../shared/widgets/app_shell_scaffold.dart';
 import '../../shared/widgets/success_screen.dart';
 import 'route_names.dart';
@@ -73,19 +74,31 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: RoutePaths.donateGuidelines, name: RouteNames.donateGuidelines,
           builder: (context, state) => const DonateGuidelinesScreen()),
       GoRoute(path: RoutePaths.donateForm, name: RouteNames.donateForm,
-          builder: (context, state) => const DonateFormScreen()),
+          builder: (context, state) => DonateFormScreen(imagePath: state.uri.queryParameters['imagePath'])),
 
       // REQUEST FLOW
       GoRoute(path: RoutePaths.requestGuidelines, name: RouteNames.requestGuidelines,
           builder: (context, state) => const RequestGuidelinesScreen()),
       GoRoute(path: RoutePaths.requestForm, name: RouteNames.requestForm,
-          builder: (context, state) => const RequestFormScreen()),
+          builder: (context, state) {
+            final params = state.uri.queryParameters;
+            return RequestFormScreen(
+              imagePath: params['imagePath'],
+              initialName: params['name'],
+              initialCategory: params['category'],
+              initialUnit: params['unit'],
+            );
+          }),
       GoRoute(path: RoutePaths.categoryMedicines, name: RouteNames.categoryMedicines,
           builder: (context, state) => CategoryMedicinesScreen(category: state.pathParameters['category'] ?? '')),
 
       // MEDICINE DETAILS
       GoRoute(path: RoutePaths.medicineDetails, name: RouteNames.medicineDetails,
           builder: (_, state) => MedicineDetailsScreen(medicineId: state.pathParameters['id'] ?? '1')),
+
+      // ORDER CONFIRMATION
+      GoRoute(path: RoutePaths.orderConfirmation, name: RouteNames.orderConfirmation,
+          builder: (_, state) => OrderConfirmationScreen(medicineId: state.pathParameters['id'] ?? '1')),
 
       // PROFILE SUB-ROUTES
       GoRoute(path: RoutePaths.editProfile, name: RouteNames.editProfile,

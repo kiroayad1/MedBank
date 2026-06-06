@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/router/route_names.dart';
@@ -9,6 +10,62 @@ import '../../../core/theme/theme.dart';
 /// and category grid. Fully localized and RTL-aware.
 class RequestGuidelinesScreen extends StatelessWidget {
   const RequestGuidelinesScreen({super.key});
+
+  Future<void> _pickImage(BuildContext context, ImageSource source) async {
+    final picker = ImagePicker();
+    try {
+      final XFile? image = await picker.pickImage(
+        source: source,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
+      );
+      if (image != null && context.mounted) {
+        // Navigate to form and pass the image path
+        context.pushNamed(RouteNames.requestForm, queryParameters: {
+          'imagePath': image.path,
+        });
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(context.l10n.appName)), // Fallback error msg
+        );
+      }
+    }
+  }
+
+  void _showImageSourceSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_rounded),
+              title: const Text('Camera'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage(context, ImageSource.camera);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded),
+              title: const Text('Gallery'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickImage(context, ImageSource.gallery);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,9 +169,7 @@ class RequestGuidelinesScreen extends StatelessWidget {
                 text: l.withMedicineImage,
                 colors: colors,
                 isDark: isDark,
-                onTap: () {
-                  // TODO: camera / image picker
-                },
+                onTap: () => _showImageSourceSheet(context),
               ),
               const SizedBox(height: 12),
               _ActionButton(
@@ -122,9 +177,7 @@ class RequestGuidelinesScreen extends StatelessWidget {
                 text: l.withPrescription,
                 colors: colors,
                 isDark: isDark,
-                onTap: () {
-                  // TODO: prescription upload
-                },
+                onTap: () => _showImageSourceSheet(context),
               ),
               const SizedBox(height: 28),
 

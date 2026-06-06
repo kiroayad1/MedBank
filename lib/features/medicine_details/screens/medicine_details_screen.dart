@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/router/route_names.dart';
 import '../../../core/theme/theme.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../medicine_search/models/medicine_model.dart';
@@ -149,11 +151,7 @@ class MedicineDetailsScreen extends ConsumerWidget {
               child: AppButton(
                 label: l.requestThisMedicine,
                 onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(l.requestSubmitted),
-                    ),
-                  );
+                  context.push(RoutePaths.orderConfirmationFor(medicine.id));
                 },
                 icon: Icons.check_circle_outline_rounded,
               ),

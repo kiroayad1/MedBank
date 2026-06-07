@@ -310,9 +310,11 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   // ──────────────────────────────────────────────
 
   Widget _buildOtpRow(ColorScheme colors, bool isDark) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(_otpLength, (index) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: List.generate(_otpLength, (index) {
         return SizedBox(
           width: 48,
           height: 56,
@@ -354,6 +356,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
           ),
         );
       }),
-    );
-  }
+    ),
+  );
+}
 }

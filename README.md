@@ -34,6 +34,7 @@ If you are testing locally on an Android Emulator, use `http://10.0.2.2:PORT/api
 
 Comprehensive documentation for backend integration is available in the `docs/` folder:
 
+- [Architecture Guide](docs/ARCHITECTURE.md) — Layered architecture, data flow, and feature workflow for the Flutter app.
 - [Integration Guide](docs/INTEGRATION.md) — The main handoff document explaining architecture and connections.
 - [API Contract](docs/API_CONTRACT.md) — Endpoint notes and expectations.
 - [OpenAPI Spec](docs/api/openapi.json) — The full OpenAPI 3.0 specification exported from the initial mockup backend.

@@ -1,0 +1,565 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "MedBank API",
+    "description": "MedBank is a medicine donation and request platform backend API. Built with Node.js, Express, and SQLite.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "MedBank Support",
+      "url": "https://github.com/MinaSaadallah/MED"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "Local development server"
+    }
+  ],
+  "tags": [
+    { "name": "Health", "description": "Server health checks" },
+    { "name": "Stats", "description": "Platform statistics" },
+    { "name": "Auth", "description": "Authentication & user management" },
+    { "name": "Medicines", "description": "Medicine catalog & donations" },
+    { "name": "Donations", "description": "Donation records" },
+    { "name": "Requests", "description": "Medicine requests & orders" },
+    { "name": "Notifications", "description": "User notifications" },
+    { "name": "Pharmacies", "description": "Pharmacy directory" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "JWT token obtained from /api/Auth/login"
+      }
+    },
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "example": "550e8400-e29b-41d4-a716-446655440000" },
+          "fullName": { "type": "string", "example": "Ahmed Mohamed" },
+          "phoneNumber": { "type": "string", "example": "01012345678" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Medicine": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "example": 1 },
+          "name": { "type": "string", "example": "Panadol Extra" },
+          "arName": { "type": "string", "example": "بانادول إكسترا" },
+          "description": { "type": "string" },
+          "expiryDate": { "type": "string", "example": "12/2026" },
+          "quantity": { "type": "integer", "example": 50 },
+          "price": { "type": "number", "example": 45 },
+          "imageUrl": { "type": "string", "format": "uri" },
+          "category": { "type": "string", "example": "Tablets" },
+          "manufacturer": { "type": "string", "example": "GSK" },
+          "condition": { "type": "string", "example": "Sealed" },
+          "dosageForm": { "type": "string", "example": "Tablet" },
+          "strength": { "type": "string", "example": "500mg/65mg" },
+          "popularity": { "type": "integer", "example": 98 },
+          "location": { "type": "string", "example": "Cairo" },
+          "donorId": { "type": "string" },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Request": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "medicineId": { "type": "integer" },
+          "requesterId": { "type": "string" },
+          "quantity": { "type": "integer", "example": 2 },
+          "status": { "type": "string", "enum": ["Pending", "Approved", "Delivered"], "example": "Pending" },
+          "requestDate": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Notification": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "userId": { "type": "string" },
+          "title": { "type": "string", "example": "Your donation received" },
+          "message": { "type": "string" },
+          "type": { "type": "string", "enum": ["donation", "request"], "example": "donation" },
+          "category": { "type": "string" },
+          "medicineId": { "type": "integer" },
+          "medicineName": { "type": "string" },
+          "isRead": { "type": "integer", "example": 0 },
+          "createdAt": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Pharmacy": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string", "example": "El Ezaby Pharmacy" },
+          "arName": { "type": "string", "example": "صيدلية العزبي" },
+          "address": { "type": "string" },
+          "city": { "type": "string", "example": "Cairo" },
+          "district": { "type": "string", "example": "Zamalek" },
+          "phone": { "type": "string" },
+          "isOpen24H": { "type": "integer", "example": 1 },
+          "acceptsDonations": { "type": "integer", "example": 1 },
+          "latitude": { "type": "number" },
+          "longitude": { "type": "number" }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string", "example": "Error message" }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": ["Health"],
+        "summary": "Health check",
+        "description": "Returns API server status",
+        "responses": {
+          "200": {
+            "description": "Server is running",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": { "type": "string", "example": "OK" },
+                    "message": { "type": "string", "example": "MedBank API is running" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/stats": {
+      "get": {
+        "tags": ["Stats"],
+        "summary": "Get platform statistics",
+        "description": "Returns real-time counts of medicines, requests, users, and donations",
+        "responses": {
+          "200": {
+            "description": "Statistics retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "medicines": { "type": "integer", "example": 174 },
+                    "requests": { "type": "integer", "example": 12 },
+                    "users": { "type": "integer", "example": 45 },
+                    "donations": { "type": "integer", "example": 8 }
+                  }
+                }
+              }
+            }
+          },
+          "500": { "description": "Server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/Auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fullName", "phoneNumber", "password"],
+                "properties": {
+                  "fullName": { "type": "string", "example": "Ahmed Mohamed" },
+                  "phoneNumber": { "type": "string", "example": "01012345678" },
+                  "password": { "type": "string", "minLength": 6, "example": "123456" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created", "content": { "application/json": { "schema": { "type": "object", "properties": { "isSuccess": { "type": "boolean", "example": true }, "message": { "type": "string" } } } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "500": { "description": "Server error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
+        }
+      }
+    },
+    "/Auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phoneNumber", "password"],
+                "properties": {
+                  "phoneNumber": { "type": "string", "example": "01012345678" },
+                  "password": { "type": "string", "example": "123456" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isSuccess": { "type": "boolean", "example": true },
+                    "message": { "type": "string" },
+                    "token": { "type": "string", "example": "eyJhbGciOiJIUzI1NiIs..." },
+                    "fullName": { "type": "string" },
+                    "phoneNumber": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": { "description": "Invalid credentials" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Auth/update-profile": {
+      "put": {
+        "tags": ["Auth"],
+        "summary": "Update user profile",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fullName", "phoneNumber"],
+                "properties": {
+                  "fullName": { "type": "string" },
+                  "phoneNumber": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Profile updated" },
+          "400": { "description": "Validation error" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "User not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Medicine": {
+      "get": {
+        "tags": ["Medicines"],
+        "summary": "Get all medicines",
+        "description": "Returns all medicines ordered by popularity. No authentication required.",
+        "responses": {
+          "200": {
+            "description": "List of medicines",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Medicine" } }
+              }
+            }
+          },
+          "500": { "description": "Server error" }
+        }
+      },
+      "post": {
+        "tags": ["Medicines"],
+        "summary": "Create a new medicine donation",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "expiryDate"],
+                "properties": {
+                  "name": { "type": "string" },
+                  "arName": { "type": "string" },
+                  "description": { "type": "string" },
+                  "expiryDate": { "type": "string", "example": "12/2026" },
+                  "quantity": { "type": "integer", "default": 1 },
+                  "price": { "type": "number", "default": 0 },
+                  "imageUrl": { "type": "string" },
+                  "category": { "type": "string", "default": "Other" },
+                  "manufacturer": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "dosageForm": { "type": "string" },
+                  "strength": { "type": "string" },
+                  "popularity": { "type": "integer", "default": 0 },
+                  "location": { "type": "string", "default": "Cairo" },
+                  "deliveryMethod": { "type": "string", "enum": ["pickup", "pharmacy"] },
+                  "deliveryAddress": { "type": "string" },
+                  "pharmacyName": { "type": "string" },
+                  "alternativePhone": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Medicine created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Medicine" } } } },
+          "400": { "description": "Missing required fields" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Medicine/by-category/{category}": {
+      "get": {
+        "tags": ["Medicines"],
+        "summary": "Get medicines by category",
+        "parameters": [
+          { "name": "category", "in": "path", "required": true, "schema": { "type": "string" }, "example": "Tablets" }
+        ],
+        "responses": {
+          "200": { "description": "Medicines in category", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Medicine" } } } } },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Medicine/{id}": {
+      "get": {
+        "tags": ["Medicines"],
+        "summary": "Get medicine by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Medicine found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Medicine" } } } },
+          "404": { "description": "Medicine not found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "put": {
+        "tags": ["Medicines"],
+        "summary": "Update medicine",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "expiryDate": { "type": "string" },
+                  "quantity": { "type": "integer" },
+                  "price": { "type": "number" },
+                  "imageUrl": { "type": "string" },
+                  "category": { "type": "string" },
+                  "manufacturer": { "type": "string" },
+                  "condition": { "type": "string" },
+                  "location": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "Updated successfully" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Medicine not found" },
+          "500": { "description": "Server error" }
+        }
+      },
+      "delete": {
+        "tags": ["Medicines"],
+        "summary": "Delete medicine",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "204": { "description": "Deleted successfully" },
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Medicine not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Donation": {
+      "post": {
+        "tags": ["Donations"],
+        "summary": "Create a donation record",
+        "description": "Links a medicine to a donor. Creates medicine if not exists.",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["medicineName", "expiryDate"],
+                "properties": {
+                  "medicineName": { "type": "string" },
+                  "expiryDate": { "type": "string" },
+                  "quantity": { "type": "integer", "default": 1 },
+                  "imageUrl": { "type": "string" },
+                  "deliveryMethod": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Donation created" },
+          "400": { "description": "Missing required fields" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Donation/my-donations": {
+      "get": {
+        "tags": ["Donations"],
+        "summary": "Get current user's donations",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "User's donations", "content": { "application/json": { "schema": { "type": "array", "items": { "type": "object" } } } } },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Request/checkout": {
+      "post": {
+        "tags": ["Requests"],
+        "summary": "Checkout cart items",
+        "description": "Creates request records and deducts stock",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "medicineId": { "type": "integer" },
+                    "quantity": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Order placed" },
+          "400": { "description": "Invalid items or insufficient stock" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Request/history": {
+      "get": {
+        "tags": ["Requests"],
+        "summary": "Get request history",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Request history", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Request" } } } } },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Notification": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Get user notifications",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Notifications list", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Notification" } } } } },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Notification/unread-count": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Get unread notification count",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Unread count", "content": { "application/json": { "schema": { "type": "object", "properties": { "count": { "type": "integer" } } } } } },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Notification/mark-read": {
+      "post": {
+        "tags": ["Notifications"],
+        "summary": "Mark all notifications as read",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "Marked as read" },
+          "401": { "description": "Unauthorized" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Pharmacy": {
+      "get": {
+        "tags": ["Pharmacies"],
+        "summary": "Get all pharmacies",
+        "responses": {
+          "200": { "description": "Pharmacies list", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Pharmacy" } } } } },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Pharmacy/search": {
+      "get": {
+        "tags": ["Pharmacies"],
+        "summary": "Search pharmacies",
+        "parameters": [
+          { "name": "q", "in": "query", "required": true, "schema": { "type": "string" }, "description": "Search query" }
+        ],
+        "responses": {
+          "200": { "description": "Matching pharmacies" },
+          "400": { "description": "Missing query" },
+          "500": { "description": "Server error" }
+        }
+      }
+    },
+    "/Pharmacy/{id}": {
+      "get": {
+        "tags": ["Pharmacies"],
+        "summary": "Get pharmacy by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "integer" } }
+        ],
+        "responses": {
+          "200": { "description": "Pharmacy found", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Pharmacy" } } } },
+          "404": { "description": "Pharmacy not found" },
+          "500": { "description": "Server error" }
+        }
+      }
+    }
+  }
+}

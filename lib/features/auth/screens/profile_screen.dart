@@ -18,6 +18,7 @@ class ProfileScreen extends ConsumerWidget {
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final l = context.l10n;
+    final authState = ref.watch(authProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -29,7 +30,12 @@ class ProfileScreen extends ConsumerWidget {
         child: Column(
           children: [
             // ── Avatar + Info ──
-            _AvatarSection(colors: colors, isDark: isDark),
+            _AvatarSection(
+              colors: colors,
+              isDark: isDark,
+              fullName: authState.fullName ?? 'User',
+              phoneNumber: authState.phoneNumber ?? '+20 100 000 0000',
+            ),
             AppSpacing.gapXxl,
 
             // ── Account Section ──
@@ -46,7 +52,9 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
+                  color: isDark
+                      ? AppColors.dividerDark
+                      : AppColors.dividerLight,
                 ),
                 _ActionTile(
                   icon: Icons.lock_outline_rounded,
@@ -56,7 +64,9 @@ class ProfileScreen extends ConsumerWidget {
                 ),
                 Divider(
                   height: 1,
-                  color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
+                  color: isDark
+                      ? AppColors.dividerDark
+                      : AppColors.dividerLight,
                 ),
                 _ActionTile(
                   icon: Icons.settings_outlined,
@@ -112,9 +122,24 @@ class ProfileScreen extends ConsumerWidget {
 
 // ── Avatar Section ──
 class _AvatarSection extends StatelessWidget {
-  const _AvatarSection({required this.colors, required this.isDark});
+  const _AvatarSection({
+    required this.colors,
+    required this.isDark,
+    required this.fullName,
+    required this.phoneNumber,
+  });
+
   final ColorScheme colors;
   final bool isDark;
+  final String fullName;
+  final String phoneNumber;
+
+  String get initials {
+    final parts = fullName.trim().split(' ').where((p) => p.isNotEmpty).toList();
+    if (parts.isEmpty) return 'U';
+    if (parts.length == 1) return parts[0][0].toUpperCase();
+    return '${parts[0][0]}${parts.last[0]}'.toUpperCase();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -140,7 +165,7 @@ class _AvatarSection extends StatelessWidget {
           ),
           child: Center(
             child: Text(
-              'KA',
+              initials,
               style: AppTypography.headlineLarge.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -150,13 +175,15 @@ class _AvatarSection extends StatelessWidget {
         ),
         AppSpacing.gapLg,
         Text(
-          'Kiro Ayad',
+          fullName,
           style: AppTypography.headlineMedium.copyWith(color: colors.onSurface),
         ),
         AppSpacing.gapXs,
         Text(
-          '+20 100 123 4567',
-          style: AppTypography.bodyMedium.copyWith(color: colors.onSurfaceVariant),
+          phoneNumber,
+          style: AppTypography.bodyMedium.copyWith(
+            color: colors.onSurfaceVariant,
+          ),
         ),
         AppSpacing.gapXs,
         Text(
@@ -201,10 +228,14 @@ class _SectionCard extends StatelessWidget {
               children: [
                 Icon(icon, size: 18, color: colors.onSurfaceVariant),
                 const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: AppTypography.titleSmall.copyWith(
-                    color: colors.onSurfaceVariant,
+                Expanded(
+                  child: Text(
+                    title,
+                    style: AppTypography.titleSmall.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -255,11 +286,15 @@ class _ActionTile extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: AppTypography.titleSmall.copyWith(color: colors.onSurface),
+                  style: AppTypography.titleSmall.copyWith(
+                    color: colors.onSurface,
+                  ),
                 ),
               ),
               Icon(
-                isRtl ? Icons.chevron_left_rounded : Icons.chevron_right_rounded,
+                isRtl
+                    ? Icons.chevron_left_rounded
+                    : Icons.chevron_right_rounded,
                 color: colors.onSurfaceVariant,
                 size: 20,
               ),

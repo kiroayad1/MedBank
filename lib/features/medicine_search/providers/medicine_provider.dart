@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/network/api_config.dart';
+import '../../../core/network/services/medicine_service.dart';
 import '../models/medicine_model.dart';
 
 /// State for the browse/search screen.
@@ -57,15 +59,35 @@ class MedicineSearchNotifier extends Notifier<MedicineSearchState> {
   }
 
   Future<void> _loadMedicines() async {
-    state = state.copyWith(isLoading: true);
-    // Simulate network delay
-    await Future.delayed(const Duration(milliseconds: 800));
-    final data = MedicineDummyData.medicines;
-    state = state.copyWith(
-      medicines: data,
-      filteredMedicines: data,
-      isLoading: false,
-    );
+    state = state.copyWith(isLoading: true, errorMessage: () => null);
+    
+    if (!ApiConfig.useLiveBackend) {
+      await Future.delayed(const Duration(milliseconds: 800));
+      final data = MedicineDummyData.medicines;
+      state = state.copyWith(
+        medicines: data,
+        filteredMedicines: data,
+        isLoading: false,
+      );
+      return;
+    }
+
+    try {
+      final res = await MedicineService.instance.getAll();
+      final List<Medicine> data = res.map((json) => Medicine.fromJson(json)).toList();
+      
+      state = state.copyWith(
+        medicines: data,
+        filteredMedicines: data,
+        isLoading: false,
+      );
+      _applyFilters();
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: () => 'Failed to load medicines: $e',
+      );
+    }
   }
 
   /// Debounced search to avoid excessive filtering.
@@ -102,6 +124,7 @@ class MedicineSearchNotifier extends Notifier<MedicineSearchState> {
     if (query.isNotEmpty) {
       results = results.where((m) {
         return m.name.toLowerCase().contains(query) ||
+            (m.arName?.toLowerCase().contains(query) ?? false) ||
             m.category.toLowerCase().contains(query) ||
             m.description.toLowerCase().contains(query) ||
             m.location.toLowerCase().contains(query);
@@ -121,7 +144,6 @@ class MedicineSearchNotifier extends Notifier<MedicineSearchState> {
   /// Refresh data from source.
   Future<void> refresh() async {
     await _loadMedicines();
-    _applyFilters();
   }
 }
 

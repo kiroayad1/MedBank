@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/network/api_config.dart';
+import '../../../core/network/services/medicine_service.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/theme/theme.dart';
 import '../../../shared/widgets/app_button.dart';
@@ -12,30 +14,86 @@ import '../../medicine_search/models/medicine_model.dart';
 ///
 /// Shows full details for a medicine: name, category, description,
 /// quantity, expiry, location, condition, manufacturer.
-class MedicineDetailsScreen extends ConsumerWidget {
+class MedicineDetailsScreen extends ConsumerStatefulWidget {
   const MedicineDetailsScreen({super.key, required this.medicineId});
 
   final String medicineId;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MedicineDetailsScreen> createState() =>
+      _MedicineDetailsScreenState();
+}
+
+class _MedicineDetailsScreenState extends ConsumerState<MedicineDetailsScreen> {
+  Medicine? _medicine;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMedicine();
+  }
+
+  Future<void> _loadMedicine() async {
+    if (!ApiConfig.useLiveBackend) {
+      final found = MedicineDummyData.medicines.firstWhere(
+        (m) => m.id == widget.medicineId,
+        orElse: () => MedicineDummyData.medicines.first,
+      );
+      setState(() {
+        _medicine = found;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final res = await MedicineService.instance.getById(
+        int.parse(widget.medicineId),
+      );
+      setState(() {
+        _medicine = Medicine.fromJson(res);
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load medicine: $e';
+        _isLoading = false;
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final l = context.l10n;
 
-    // Find the medicine from dummy data
-    final medicine = MedicineDummyData.medicines.firstWhere(
-      (m) => m.id == medicineId,
-      orElse: () => MedicineDummyData.medicines.first,
-    );
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l.appName, style: theme.appBarTheme.titleTextStyle),
+        ),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null || _medicine == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(l.appName, style: theme.appBarTheme.titleTextStyle),
+        ),
+        body: Center(child: Text(_error ?? 'Medicine not found')),
+      );
+    }
+
+    final medicine = _medicine!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          l.appName,
-          style: theme.appBarTheme.titleTextStyle,
-        ),
+        title: Text(l.appName, style: theme.appBarTheme.titleTextStyle),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -50,7 +108,7 @@ class MedicineDetailsScreen extends ConsumerWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    gradient: AppColors.heroGradient,
+                    gradient: isDark ? AppColors.darkHeroGradient : AppColors.heroGradient,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,17 +117,19 @@ class MedicineDetailsScreen extends ConsumerWidget {
                         children: [
                           Expanded(
                             child: Text(
-                              medicine.name,
+                              medicine.localizedName(l.locale.languageCode),
                               style: AppTypography.displaySmall.copyWith(
                                 color: colors.onSurface,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           _AvailabilityBadge(isAvailable: medicine.isAvailable),
                         ],
                       ),
                       AppSpacing.gapSm,
-                      _CategoryChip(category: medicine.category),
+                      _CategoryChip(category: l.categoryDisplay(medicine.category)),
                     ],
                   ),
                 ),
@@ -80,11 +140,13 @@ class MedicineDetailsScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: AppSpacing.cardPaddingLarge,
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.cardDark : AppColors.cardLight,
                   borderRadius: AppShapes.borderRadiusLg,
-                  boxShadow: isDark ? AppShadows.cardDark : AppShadows.cardLight,
+                  boxShadow: isDark
+                      ? AppShadows.cardDark
+                      : AppShadows.cardLight,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,6 +164,8 @@ class MedicineDetailsScreen extends ConsumerWidget {
                         color: colors.onSurfaceVariant,
                         height: 1.6,
                       ),
+                      maxLines: 5,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     AppSpacing.gapXxl,
 
@@ -124,7 +188,8 @@ class MedicineDetailsScreen extends ConsumerWidget {
                     _InfoRow(
                       icon: Icons.location_on_outlined,
                       label: l.location,
-                      value: '${medicine.location} (${medicine.distanceFormatted})',
+                      value:
+                          '${medicine.location} (${medicine.distanceFormatted})',
                     ),
                     AppSpacing.gapLg,
                     _InfoRow(
@@ -151,7 +216,15 @@ class MedicineDetailsScreen extends ConsumerWidget {
               child: AppButton(
                 label: l.requestThisMedicine,
                 onPressed: () {
-                  context.push(RoutePaths.orderConfirmationFor(medicine.id));
+                  context.pushNamed(
+                    RouteNames.requestForm,
+                    queryParameters: {
+                      'id': medicine.id,
+                      'name': medicine.localizedName(l.locale.languageCode),
+                      'category': medicine.category,
+                      'unit': medicine.unit,
+                    },
+                  );
                 },
                 icon: Icons.check_circle_outline_rounded,
               ),
@@ -169,19 +242,26 @@ class _AvailabilityBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: isAvailable
-            ? AppColors.success.withValues(alpha: 0.1)
-            : AppColors.disabledLight.withValues(alpha: 0.2),
-        borderRadius: AppShapes.borderRadiusFull,
-      ),
-      child: Text(
-        isAvailable ? context.l10n.available.toUpperCase() : context.l10n.unavailable,
-        style: AppTypography.labelMedium.copyWith(
-          color: isAvailable ? AppColors.success : AppColors.disabledLight,
-          fontWeight: FontWeight.w700,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 110),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isAvailable
+              ? AppColors.success.withValues(alpha: 0.1)
+              : AppColors.disabledLight.withValues(alpha: 0.2),
+          borderRadius: AppShapes.borderRadiusFull,
+        ),
+        child: Text(
+          isAvailable
+              ? context.l10n.available.toUpperCase()
+              : context.l10n.unavailable,
+          style: AppTypography.labelMedium.copyWith(
+            color: isAvailable ? AppColors.success : AppColors.disabledLight,
+            fontWeight: FontWeight.w700,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
@@ -194,17 +274,22 @@ class _CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: AppColors.chipColorForCategory(category),
-        borderRadius: AppShapes.borderRadiusSm,
-      ),
-      child: Text(
-        category.toUpperCase(),
-        style: AppTypography.labelSmall.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 180),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.chipColorForCategory(category),
+          borderRadius: AppShapes.borderRadiusSm,
+        ),
+        child: Text(
+          category.toUpperCase(),
+          style: AppTypography.labelSmall.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
@@ -256,6 +341,8 @@ class _InfoRow extends StatelessWidget {
                   color: valueColor ?? colors.onSurface,
                   fontWeight: FontWeight.w500,
                 ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

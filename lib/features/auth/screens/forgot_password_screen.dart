@@ -30,9 +30,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     await Future.delayed(const Duration(seconds: 1));
     setState(() => _isLoading = false);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.verificationSent)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.verificationSent)));
     }
   }
 
@@ -53,78 +53,80 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ? AppColors.darkBackgroundGradient
               : AppColors.backgroundGradient,
         ),
-        child: Padding(
-          padding: AppSpacing.screenPadding,
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                AppSpacing.gapXxl,
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: AppSpacing.screenPadding,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppSpacing.gapXxl,
 
-                Text(
-                  l.forgotPasswordTitle,
-                  style: AppTypography.displaySmall.copyWith(
-                    color: colors.onSurface,
+                  Text(
+                    l.forgotPasswordTitle,
+                    style: AppTypography.displaySmall.copyWith(
+                      color: colors.onSurface,
+                    ),
                   ),
-                ),
-                AppSpacing.gapSm,
-                Text(
-                  l.forgotPasswordSubtitle,
-                  style: AppTypography.bodyMedium.copyWith(
-                    color: colors.onSurfaceVariant,
+                  AppSpacing.gapSm,
+                  Text(
+                    l.forgotPasswordSubtitle,
+                    style: AppTypography.bodyMedium.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
                   ),
-                ),
-                AppSpacing.gapXxxl,
+                  AppSpacing.gapXxxl,
 
-                // ── Phone Field ──
-                AppTextField(
-                  controller: _phoneController,
-                  label: l.phoneNumber,
-                  hint: '(555) 000-0000',
-                  keyboardType: TextInputType.phone,
-                  textInputAction: TextInputAction.done,
-                  prefix: Padding(
-                    padding: const EdgeInsetsDirectional.only(end: 8),
-                    child: Text(
-                      '+20',
-                      style: AppTypography.bodyLarge.copyWith(
-                        color: colors.onSurface,
+                  // ── Phone Field ──
+                  AppTextField(
+                    controller: _phoneController,
+                    label: l.phoneNumber,
+                    hint: '(555) 000-0000',
+                    keyboardType: TextInputType.phone,
+                    textInputAction: TextInputAction.done,
+                    prefix: Padding(
+                      padding: const EdgeInsetsDirectional.only(end: 8),
+                      child: Text(
+                        '+20',
+                        style: AppTypography.bodyLarge.copyWith(
+                          color: colors.onSurface,
+                        ),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.trim().isEmpty) {
+                        return l.phoneRequired;
+                      }
+                      return null;
+                    },
+                  ),
+                  AppSpacing.gapXxxl,
+
+                  // ── Reset Button ──
+                  AppButton(
+                    label: l.resetPassword,
+                    onPressed: _handleReset,
+                    isLoading: _isLoading,
+                  ),
+
+                  AppSpacing.gapXxxl,
+
+                  // ── Try Another Way ──
+                  Center(
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        l.tryAnotherWay,
+                        style: AppTypography.titleSmall.copyWith(
+                          color: AppColors.accent,
+                        ),
                       ),
                     ),
                   ),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return l.phoneRequired;
-                    }
-                    return null;
-                  },
-                ),
-                AppSpacing.gapXxxl,
-
-                // ── Reset Button ──
-                AppButton(
-                  label: l.resetPassword,
-                  onPressed: _handleReset,
-                  isLoading: _isLoading,
-                ),
-
-                const Spacer(),
-
-                // ── Try Another Way ──
-                Center(
-                  child: TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      l.tryAnotherWay,
-                      style: AppTypography.titleSmall.copyWith(
-                        color: AppColors.accent,
-                      ),
-                    ),
-                  ),
-                ),
-                AppSpacing.gapXxl,
-              ],
+                  AppSpacing.gapXxl,
+                ],
+              ),
             ),
           ),
         ),

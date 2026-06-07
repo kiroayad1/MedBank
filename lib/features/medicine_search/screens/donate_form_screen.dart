@@ -9,16 +9,19 @@ import '../../../core/theme/theme.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/donation_provider.dart';
+
 /// Donate Form screen matching reference design.
-class DonateFormScreen extends StatefulWidget {
+class DonateFormScreen extends ConsumerStatefulWidget {
   final String? imagePath;
   const DonateFormScreen({super.key, this.imagePath});
 
   @override
-  State<DonateFormScreen> createState() => _DonateFormScreenState();
+  ConsumerState<DonateFormScreen> createState() => _DonateFormScreenState();
 }
 
-class _DonateFormScreenState extends State<DonateFormScreen> {
+class _DonateFormScreenState extends ConsumerState<DonateFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameCtrl = TextEditingController();
   final _qtyCtrl = TextEditingController();
@@ -58,9 +61,9 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Error picking image')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(context.l10n.pickImageError)));
       }
     }
   }
@@ -77,7 +80,7 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded),
-              title: const Text('Camera'),
+              title: Text(context.l10n.camera),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickImage(ImageSource.camera);
@@ -85,7 +88,7 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_rounded),
-              title: const Text('Gallery'),
+              title: Text(context.l10n.gallery),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickImage(ImageSource.gallery);
@@ -109,12 +112,41 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_expiry == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(context.l10n.selectExpiryError)),
+      );
+      return;
+    }
+    
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() => _isLoading = false);
-    if (mounted) {
-      context.pushReplacementNamed(RouteNames.success,
-          queryParameters: {'type': 'donation'});
+    
+    try {
+      await ref.read(donationProvider.notifier).createDonation(
+        medicineName: _nameCtrl.text,
+        expiryDate: '${_expiry!.month.toString().padLeft(2, '0')}/${_expiry!.year}',
+        quantity: int.tryParse(_qtyCtrl.text) ?? 1,
+        category: _category ?? 'Other',
+        unit: _unit ?? 'Units',
+        condition: _condition ?? 'Sealed',
+        location: _locCtrl.text.isEmpty ? 'Cairo' : _locCtrl.text,
+        manufacturer: _mfgCtrl.text.isEmpty ? null : _mfgCtrl.text,
+      );
+      
+      if (mounted) {
+        context.pushReplacementNamed(
+          RouteNames.success,
+          queryParameters: {'type': 'donation'},
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${context.l10n.donateError}: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -127,8 +159,10 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(l.medicineDetails,
-            style: AppTypography.appBarBrand.copyWith(color: colors.primary)),
+        title: Text(
+          l.medicineDetails,
+          style: AppTypography.appBarBrand.copyWith(color: colors.primary),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -137,17 +171,30 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
               margin: const EdgeInsets.fromLTRB(24, 8, 24, 0),
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? colors.primary.withValues(alpha: 0.08) : AppColors.primarySurface,
+                color: isDark
+                    ? colors.primary.withValues(alpha: 0.08)
+                    : AppColors.primarySurface,
                 borderRadius: AppShapes.borderRadiusMd,
               ),
-              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Icon(Icons.info_outline_rounded, color: colors.primary, size: 20),
-                AppSpacing.gapHSm,
-                Expanded(child: Text(
-                  l.donateFormInfo,
-                  style: AppTypography.bodySmall.copyWith(color: colors.onSurfaceVariant),
-                )),
-              ]),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(
+                    Icons.info_outline_rounded,
+                    color: colors.primary,
+                    size: 20,
+                  ),
+                  AppSpacing.gapHSm,
+                  Expanded(
+                    child: Text(
+                      l.donateFormInfo,
+                      style: AppTypography.bodySmall.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
 
             // Image Picker Section
@@ -164,7 +211,9 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
                     borderRadius: AppShapes.borderRadiusLg,
                     border: Border.all(
                       color: colors.primary.withValues(alpha: 0.2),
-                      style: _imagePath == null ? BorderStyle.solid : BorderStyle.none,
+                      style: _imagePath == null
+                          ? BorderStyle.solid
+                          : BorderStyle.none,
                     ),
                   ),
                   child: _imagePath != null
@@ -173,15 +222,23 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
                           children: [
                             ClipRRect(
                               borderRadius: AppShapes.borderRadiusLg,
-                              child: Image.file(File(_imagePath!), fit: BoxFit.cover),
+                              child: Image.file(
+                                File(_imagePath!),
+                                fit: BoxFit.cover,
+                              ),
                             ),
                             Positioned(
-                              top: 8, right: 8,
+                              top: 8,
+                              right: 8,
                               child: CircleAvatar(
                                 backgroundColor: Colors.black54,
                                 radius: 18,
                                 child: IconButton(
-                                  icon: const Icon(Icons.edit, size: 16, color: Colors.white),
+                                  icon: const Icon(
+                                    Icons.edit,
+                                    size: 16,
+                                    color: Colors.white,
+                                  ),
                                   onPressed: _showImageSourceSheet,
                                 ),
                               ),
@@ -191,9 +248,18 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
                       : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.add_a_photo_outlined, size: 40, color: colors.primary),
+                            Icon(
+                              Icons.add_a_photo_outlined,
+                              size: 40,
+                              color: colors.primary,
+                            ),
                             AppSpacing.gapSm,
-                            Text(l.withMedicineImage, style: AppTypography.titleSmall.copyWith(color: colors.primary)),
+                            Text(
+                              l.withMedicineImage,
+                              style: AppTypography.titleSmall.copyWith(
+                                color: colors.primary,
+                              ),
+                            ),
                           ],
                         ),
                 ),
@@ -203,48 +269,100 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
             Padding(
               padding: const EdgeInsets.all(24),
               child: Container(
-                padding: const EdgeInsets.all(20),
+                padding: AppSpacing.cardPaddingLarge,
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.cardDark : AppColors.cardLight,
                   borderRadius: AppShapes.borderRadiusLg,
-                  boxShadow: isDark ? AppShadows.cardDark : AppShadows.cardLight,
+                  boxShadow: isDark
+                      ? AppShadows.cardDark
+                      : AppShadows.cardLight,
                 ),
                 child: Form(
                   key: _formKey,
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    AppTextField(controller: _nameCtrl, label: l.medicineNameRequired,
-                      hint: l.hintMedicineExample,
-                      validator: (v) => v == null || v.trim().isEmpty ? l.required : null),
-                    const SizedBox(height: AppSpacing.formFieldGap),
-                    _dropdown(l.categoryRequired, _category, l.selectCategory,
-                      l.formCategories, (v) => setState(() => _category = v)),
-                    const SizedBox(height: AppSpacing.formFieldGap),
-                    Row(children: [
-                      Expanded(child: AppTextField(controller: _qtyCtrl, label: l.quantityRequired,
-                        hint: '5', keyboardType: TextInputType.number,
-                        validator: (v) => v == null || v.trim().isEmpty ? l.required : null)),
-                      AppSpacing.gapHLg,
-                      Expanded(child: _dropdown(l.unitRequired, _unit, l.unitTablets,
-                        l.formUnits, (v) => setState(() => _unit = v))),
-                    ]),
-                    const SizedBox(height: AppSpacing.formFieldGap),
-                    _dateField(l.expirationDateRequired, _expiry, _pickDate),
-                    AppSpacing.gapXs,
-                    Text(l.expiryNote,
-                      style: AppTypography.bodySmall.copyWith(color: AppColors.accent)),
-                    const SizedBox(height: AppSpacing.formFieldGap),
-                    AppTextField(controller: _mfgCtrl, label: l.manufacturerOptional,
-                      hint: l.hintManufacturer),
-                    const SizedBox(height: AppSpacing.formFieldGap),
-                    _dropdown(l.conditionRequired, _condition, l.selectCondition,
-                      l.formConditions, (v) => setState(() => _condition = v)),
-                    const SizedBox(height: AppSpacing.formFieldGap),
-                    AppTextField(controller: _locCtrl, label: l.locationRequired,
-                      hint: l.hintCityArea, prefixIcon: Icons.location_on_outlined,
-                      validator: (v) => v == null || v.trim().isEmpty ? l.required : null),
-                    const SizedBox(height: AppSpacing.formSectionGap),
-                    AppButton(label: l.register, onPressed: _submit, isLoading: _isLoading),
-                  ]),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      AppTextField(
+                        controller: _nameCtrl,
+                        label: l.medicineNameRequired,
+                        hint: l.hintMedicineExample,
+                        validator: (v) =>
+                            v == null || v.trim().isEmpty ? l.required : null,
+                      ),
+                      const SizedBox(height: AppSpacing.formFieldGap),
+                      _dropdown(
+                        l.categoryRequired,
+                        _category,
+                        l.selectCategory,
+                        l.formCategories,
+                        (v) => setState(() => _category = v),
+                      ),
+                      const SizedBox(height: AppSpacing.formFieldGap),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AppTextField(
+                              controller: _qtyCtrl,
+                              label: l.quantityRequired,
+                              hint: '5',
+                              keyboardType: TextInputType.number,
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? l.required
+                                  : null,
+                            ),
+                          ),
+                          AppSpacing.gapHLg,
+                          Expanded(
+                            child: _dropdown(
+                              l.unitRequired,
+                              _unit,
+                              l.unitTablets,
+                              l.formUnits,
+                              (v) => setState(() => _unit = v),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: AppSpacing.formFieldGap),
+                      _dateField(l.expirationDateRequired, _expiry, _pickDate),
+                      AppSpacing.gapXs,
+                      Text(
+                        l.expiryNote,
+                        style: AppTypography.bodySmall.copyWith(
+                          color: AppColors.accent,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.formFieldGap),
+                      AppTextField(
+                        controller: _mfgCtrl,
+                        label: l.manufacturerOptional,
+                        hint: l.hintManufacturer,
+                      ),
+                      const SizedBox(height: AppSpacing.formFieldGap),
+                      _dropdown(
+                        l.conditionRequired,
+                        _condition,
+                        l.selectCondition,
+                        l.formConditions,
+                        (v) => setState(() => _condition = v),
+                      ),
+                      const SizedBox(height: AppSpacing.formFieldGap),
+                      AppTextField(
+                        controller: _locCtrl,
+                        label: l.locationRequired,
+                        hint: l.hintCityArea,
+                        prefixIcon: Icons.location_on_outlined,
+                        validator: (v) =>
+                            v == null || v.trim().isEmpty ? l.required : null,
+                      ),
+                      const SizedBox(height: AppSpacing.formSectionGap),
+                      AppButton(
+                        label: l.register,
+                        onPressed: _submit,
+                        isLoading: _isLoading,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -255,37 +373,81 @@ class _DonateFormScreenState extends State<DonateFormScreen> {
     );
   }
 
-  Widget _dropdown(String label, String? val, String hint, List<String> items,
-      ValueChanged<String?> onChanged) {
-    final colors = Theme.of(context).colorScheme;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: AppTypography.titleSmall.copyWith(color: colors.onSurface)),
-      AppSpacing.gapSm,
-      DropdownButtonFormField<String>(
-        value: val, hint: Text(hint),
-        icon: Icon(Icons.keyboard_arrow_down_rounded, color: colors.onSurfaceVariant),
-        items: items.map((i) => DropdownMenuItem(value: i, child: Text(i))).toList(),
-        onChanged: onChanged,
-      ),
-    ]);
+  Widget _dropdown(
+    String label,
+    String? val,
+    String hint,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+  ) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTypography.titleSmall.copyWith(color: colors.onSurface),
+        ),
+        AppSpacing.gapSm,
+        DropdownButtonFormField<String>(
+          initialValue: items.contains(val) ? val : null,
+          hint: Text(hint),
+          icon: Icon(
+            Icons.keyboard_arrow_down_rounded,
+            color: colors.onSurfaceVariant,
+          ),
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+            border: AppShapes.inputBorder(color: AppColors.dividerLight),
+            enabledBorder: AppShapes.inputBorder(
+              color: isDark ? AppColors.dividerDark : AppColors.dividerLight,
+            ),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
+          ),
+          items: items
+              .map((i) => DropdownMenuItem(value: i, child: Text(i)))
+              .toList(),
+          onChanged: onChanged,
+        ),
+      ],
+    );
   }
 
   Widget _dateField(String label, DateTime? val, VoidCallback onTap) {
     final colors = Theme.of(context).colorScheme;
     final l = context.l10n;
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label, style: AppTypography.titleSmall.copyWith(color: colors.onSurface)),
-      AppSpacing.gapSm,
-      InkWell(
-        onTap: onTap, borderRadius: AppShapes.borderRadiusMd,
-        child: InputDecorator(
-          decoration: const InputDecoration(prefixIcon: Icon(Icons.calendar_today_outlined, size: 18)),
-          child: Text(
-            val != null ? '${val.day.toString().padLeft(2, '0')}/${val.month.toString().padLeft(2, '0')}/${val.year}' : l.hintDateFormat,
-            style: AppTypography.bodyLarge.copyWith(color: val != null ? colors.onSurface : colors.onSurfaceVariant),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTypography.titleSmall.copyWith(color: colors.onSurface),
+        ),
+        AppSpacing.gapSm,
+        InkWell(
+          onTap: onTap,
+          borderRadius: AppShapes.borderRadiusMd,
+          child: InputDecorator(
+            decoration: const InputDecoration(
+              prefixIcon: Icon(Icons.calendar_today_outlined, size: 18),
+            ),
+            child: Text(
+              val != null
+                  ? '${val.day.toString().padLeft(2, '0')}/${val.month.toString().padLeft(2, '0')}/${val.year}'
+                  : l.hintDateFormat,
+              style: AppTypography.bodyLarge.copyWith(
+                color: val != null ? colors.onSurface : colors.onSurfaceVariant,
+              ),
+            ),
           ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 }

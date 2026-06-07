@@ -33,12 +33,10 @@ class _StaggeredListState extends State<StaggeredList>
   @override
   void initState() {
     super.initState();
-    final totalDuration = widget.animationDuration +
-        widget.staggerDelay * widget.children.length;
-    _controller = AnimationController(
-      vsync: this,
-      duration: totalDuration,
-    )..forward();
+    final totalDuration =
+        widget.animationDuration + widget.staggerDelay * widget.children.length;
+    _controller = AnimationController(vsync: this, duration: totalDuration)
+      ..forward();
   }
 
   @override
@@ -85,23 +83,5 @@ class _StaggeredListState extends State<StaggeredList>
         );
       }),
     );
-  }
-}
-
-/// Simplified animated builder that works with [Animation].
-class AnimatedBuilder extends AnimatedWidget {
-  const AnimatedBuilder({
-    super.key,
-    required Animation<double> animation,
-    required this.builder,
-    this.child,
-  }) : super(listenable: animation);
-
-  final Widget Function(BuildContext context, Widget? child) builder;
-  final Widget? child;
-
-  @override
-  Widget build(BuildContext context) {
-    return builder(context, child);
   }
 }

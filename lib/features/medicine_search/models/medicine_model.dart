@@ -18,6 +18,11 @@ class Medicine {
     this.donorName,
     this.donorPhone,
     this.imageUrl,
+    this.arName,
+    this.dosageForm,
+    this.strength,
+    this.price,
+    this.popularity,
   });
 
   final String id;
@@ -35,6 +40,11 @@ class Medicine {
   final String? donorName;
   final String? donorPhone;
   final String? imageUrl;
+  final String? arName;
+  final String? dosageForm;
+  final String? strength;
+  final double? price;
+  final int? popularity;
 
   /// Formatted expiry string.
   String get expiryFormatted {
@@ -49,11 +59,106 @@ class Medicine {
   /// Formatted quantity with unit.
   String get quantityFormatted => '$quantity $unit';
 
+  /// Returns the localized name based on locale code.
+  /// Use 'ar' for Arabic, anything else for English.
+  String localizedName(String localeCode) {
+    if (localeCode == 'ar' && arName != null && arName!.isNotEmpty) {
+      return arName!;
+    }
+    return name;
+  }
+
   /// Whether the medicine expires within 3 months.
   bool get isExpiringSoon {
     final threeMonths = DateTime.now().add(const Duration(days: 90));
     return expiryDate.isBefore(threeMonths);
   }
+
+  /// Create Medicine from backend JSON response.
+  factory Medicine.fromJson(Map<String, dynamic> json) {
+    // Parse expiryDate — backend sends "MM/YYYY" format
+    DateTime expiry;
+    try {
+      final parts = (json['expiryDate'] as String? ?? '01/2030').split('/');
+      if (parts.length == 2) {
+        expiry = DateTime(int.parse(parts[1]), int.parse(parts[0]));
+      } else {
+        expiry = DateTime.tryParse(json['expiryDate'] ?? '') ?? DateTime(2030);
+      }
+    } catch (_) {
+      expiry = DateTime(2030);
+    }
+
+    // Derive unit from dosageForm
+    final dosageForm = json['dosageForm'] as String?;
+    String unit = 'Units';
+    if (dosageForm != null) {
+      switch (dosageForm.toLowerCase()) {
+        case 'tablet':
+          unit = 'Tablets';
+        case 'capsule':
+          unit = 'Capsules';
+        case 'syrup':
+        case 'suspension':
+          unit = 'ml';
+        case 'injection':
+          unit = 'Vials';
+        case 'cream':
+        case 'gel':
+          unit = 'Tubes';
+        case 'drops':
+          unit = 'Drops';
+        case 'inhaler':
+          unit = 'Puffs';
+        case 'spray':
+          unit = 'Sprays';
+        case 'softgel':
+          unit = 'Softgels';
+        default:
+          unit = 'Units';
+      }
+    }
+
+    return Medicine(
+      id: json['id'].toString(),
+      name: json['name'] as String? ?? 'Unknown',
+      category: json['category'] as String? ?? 'Other',
+      quantity: json['quantity'] as int? ?? 0,
+      unit: unit,
+      expiryDate: expiry,
+      location: json['location'] as String? ?? 'Cairo',
+      distance: 0.0, // Backend doesn't have distance — could compute from GPS
+      description: json['description'] as String? ?? '',
+      manufacturer: json['manufacturer'] as String?,
+      condition: json['condition'] as String? ?? 'Sealed',
+      isAvailable: (json['quantity'] as int? ?? 0) > 0,
+      donorName: json['donorName'] as String?,
+      donorPhone: null,
+      imageUrl: json['imageUrl'] as String?,
+      arName: json['arName'] as String?,
+      dosageForm: dosageForm,
+      strength: json['strength'] as String?,
+      price: (json['price'] as num?)?.toDouble(),
+      popularity: json['popularity'] as int?,
+    );
+  }
+
+  /// Serialize to JSON for API requests.
+  Map<String, dynamic> toJson() => {
+        'name': name,
+        'arName': arName,
+        'description': description,
+        'expiryDate': expiryFormatted,
+        'quantity': quantity,
+        'price': price ?? 0,
+        'imageUrl': imageUrl,
+        'category': category,
+        'manufacturer': manufacturer,
+        'condition': condition,
+        'dosageForm': dosageForm,
+        'strength': strength,
+        'location': location,
+      };
 
   Medicine copyWith({
     String? id,
@@ -71,6 +176,11 @@ class Medicine {
     String? donorName,
     String? donorPhone,
     String? imageUrl,
+    String? arName,
+    String? dosageForm,
+    String? strength,
+    double? price,
+    int? popularity,
   }) {
     return Medicine(
       id: id ?? this.id,
@@ -88,6 +198,11 @@ class Medicine {
       donorName: donorName ?? this.donorName,
       donorPhone: donorPhone ?? this.donorPhone,
       imageUrl: imageUrl ?? this.imageUrl,
+      arName: arName ?? this.arName,
+      dosageForm: dosageForm ?? this.dosageForm,
+      strength: strength ?? this.strength,
+      price: price ?? this.price,
+      popularity: popularity ?? this.popularity,
     );
   }
 }

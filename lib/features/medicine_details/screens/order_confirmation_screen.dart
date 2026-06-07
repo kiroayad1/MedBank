@@ -13,9 +13,9 @@ import '../../medicine_search/models/medicine_model.dart';
 /// price breakdown (original price crossed out, shipping fees, total),
 /// and a "Confirm Order" CTA.
 class OrderConfirmationScreen extends StatefulWidget {
-  const OrderConfirmationScreen({super.key, required this.medicineId});
+  const OrderConfirmationScreen({super.key, required this.medicine});
 
-  final String medicineId;
+  final Medicine medicine;
 
   @override
   State<OrderConfirmationScreen> createState() =>
@@ -25,10 +25,7 @@ class OrderConfirmationScreen extends StatefulWidget {
 class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
   int _quantity = 1;
 
-  Medicine get _medicine => MedicineDummyData.medicines.firstWhere(
-        (m) => m.id == widget.medicineId,
-        orElse: () => MedicineDummyData.medicines.first,
-      );
+  Medicine get _medicine => widget.medicine;
 
   // Simulated pricing (medicines are donated; only shipping is charged)
   static const double _shippingFee = 10.0;
@@ -45,7 +42,9 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
     final medicine = _medicine;
 
     return Scaffold(
-      backgroundColor: isDark ? AppColors.backgroundDark : AppColors.backgroundLight,
+      backgroundColor: isDark
+          ? AppColors.backgroundDark
+          : AppColors.backgroundLight,
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
@@ -77,7 +76,7 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
         children: [
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20),
+              padding: AppSpacing.cardPaddingLarge,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -87,15 +86,16 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
                     decoration: BoxDecoration(
                       color: isDark ? AppColors.cardDark : AppColors.cardLight,
                       borderRadius: AppShapes.borderRadiusLg,
-                      boxShadow:
-                          isDark ? AppShadows.cardDark : AppShadows.cardLight,
+                      boxShadow: isDark
+                          ? AppShadows.cardDark
+                          : AppShadows.cardLight,
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         // Medicine name & unit
                         Text(
-                          medicine.name,
+                          medicine.localizedName(l.locale.languageCode),
                           style: AppTypography.titleMedium.copyWith(
                             color: colors.onSurface,
                           ),
@@ -153,18 +153,20 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
 
                   // ── Price Breakdown ──
                   Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: AppSpacing.cardPaddingLarge,
                     decoration: BoxDecoration(
                       color: isDark ? AppColors.cardDark : AppColors.cardLight,
                       borderRadius: AppShapes.borderRadiusLg,
-                      boxShadow:
-                          isDark ? AppShadows.cardDark : AppShadows.cardLight,
+                      boxShadow: isDark
+                          ? AppShadows.cardDark
+                          : AppShadows.cardLight,
                     ),
                     child: Column(
                       children: [
                         _PriceRow(
                           label: l.medicinesOriginalPrice,
-                          value: '${_originalPrice.toStringAsFixed(0)} ${l.egp}',
+                          value:
+                              '${_originalPrice.toStringAsFixed(0)} ${l.egp}',
                           isStrikethrough: true,
                           isDark: isDark,
                         ),
@@ -201,19 +203,23 @@ class _OrderConfirmationScreenState extends State<OrderConfirmationScreen> {
             padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
             decoration: BoxDecoration(
               color: isDark ? AppColors.surfaceDark : Colors.white,
-              boxShadow: isDark ? AppShadows.none : [
-                const BoxShadow(
-                  color: Color(0x08000000),
-                  blurRadius: 8,
-                  offset: Offset(0, -2),
-                ),
-              ],
+              boxShadow: isDark
+                  ? AppShadows.none
+                  : [
+                      const BoxShadow(
+                        color: Color(0x08000000),
+                        blurRadius: 8,
+                        offset: Offset(0, -2),
+                      ),
+                    ],
             ),
             child: AppButton(
               label: l.confirmOrder,
               onPressed: () {
-                context.goNamed(RouteNames.success,
-                    queryParameters: {'type': 'donation'});
+                context.goNamed(
+                  RouteNames.success,
+                  queryParameters: {'type': 'donation'},
+                );
               },
               icon: Icons.check_circle_outline_rounded,
             ),
@@ -269,7 +275,9 @@ class _QuantitySelector extends StatelessWidget {
           ),
           _StepButton(
             icon: Icons.add,
-            onTap: quantity < maxQuantity ? () => onChanged(quantity + 1) : null,
+            onTap: quantity < maxQuantity
+                ? () => onChanged(quantity + 1)
+                : null,
             isDark: isDark,
           ),
         ],
@@ -339,9 +347,7 @@ class _PriceRow extends StatelessWidget {
             color: colors.onSurface,
             fontWeight: FontWeight.w700,
           )
-        : AppTypography.bodyMedium.copyWith(
-            color: colors.onSurfaceVariant,
-          );
+        : AppTypography.bodyMedium.copyWith(color: colors.onSurfaceVariant);
 
     final valueStyle = isTotal
         ? AppTypography.titleMedium.copyWith(
@@ -350,15 +356,15 @@ class _PriceRow extends StatelessWidget {
           )
         : AppTypography.bodyMedium.copyWith(
             color: colors.onSurface,
-            decoration:
-                isStrikethrough ? TextDecoration.lineThrough : null,
+            decoration: isStrikethrough ? TextDecoration.lineThrough : null,
             decorationColor: colors.onSurfaceVariant,
           );
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: labelStyle),
+        Expanded(child: Text(label, style: labelStyle)),
+        const SizedBox(width: 16),
         Text(value, style: valueStyle),
       ],
     );

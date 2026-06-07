@@ -3,25 +3,70 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/network/api_config.dart';
+import '../../../core/network/services/medicine_service.dart';
 import '../../../core/router/route_names.dart';
 import '../../../core/theme/theme.dart';
 import '../../../shared/widgets/app_button.dart';
+import '../models/medicine_model.dart';
 
 /// Screen displaying a list of medicines filtered by a specific category.
 class CategoryMedicinesScreen extends ConsumerStatefulWidget {
-  const CategoryMedicinesScreen({
-    super.key,
-    required this.category,
-  });
+  const CategoryMedicinesScreen({super.key, required this.category});
 
   final String category;
 
   @override
-  ConsumerState<CategoryMedicinesScreen> createState() => _CategoryMedicinesScreenState();
+  ConsumerState<CategoryMedicinesScreen> createState() =>
+      _CategoryMedicinesScreenState();
 }
 
-class _CategoryMedicinesScreenState extends ConsumerState<CategoryMedicinesScreen> {
+class _CategoryMedicinesScreenState
+    extends ConsumerState<CategoryMedicinesScreen> {
   final _searchController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMedicines();
+  }
+
+  List<Medicine> _medicines = [];
+  bool _isLoading = true;
+  String? _error;
+
+  Future<void> _loadMedicines() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    if (!ApiConfig.useLiveBackend) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      final all = MedicineDummyData.medicines
+          .where((m) => m.category == widget.category)
+          .toList();
+      setState(() {
+        _medicines = all;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    try {
+      final res = await MedicineService.instance.getByCategory(widget.category);
+      final data = res.map((json) => Medicine.fromJson(json)).toList();
+      setState(() {
+        _medicines = data;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load medicines: $e';
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -36,18 +81,19 @@ class _CategoryMedicinesScreenState extends ConsumerState<CategoryMedicinesScree
     final isDark = theme.brightness == Brightness.dark;
     final l = context.l10n;
 
-    // For demonstration, we use some dummy data that matches the requested design.
-    // In a real app, this would be fetched from a provider based on the category.
-    final dummyMedicines = [
-      _DummyMed(name: 'Amoxicillin 500mg', qty: 5, unit: l.unitTablets, condition: l.condSealed),
-      _DummyMed(name: 'Panadol Extra', qty: 2, unit: l.unitBoxes, condition: l.condNew),
-      _DummyMed(name: 'Ibuprofen 400mg', qty: 10, unit: l.unitCapsules, condition: l.condUnopened),
-    ];
+    var medicines = _medicines;
+    final query = _searchController.text.trim().toLowerCase();
+    if (query.isNotEmpty) {
+      medicines = medicines.where((m) {
+        return m.name.toLowerCase().contains(query) ||
+            m.description.toLowerCase().contains(query);
+      }).toList();
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.category,
+          l.categoryDisplay(widget.category),
           style: AppTypography.headlineSmall.copyWith(color: colors.onSurface),
         ),
       ),
@@ -55,19 +101,21 @@ class _CategoryMedicinesScreenState extends ConsumerState<CategoryMedicinesScree
         children: [
           // ── Search Bar ──
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+            padding: AppSpacing.screenPaddingAll,
             child: Container(
               decoration: BoxDecoration(
                 color: isDark ? AppColors.surfaceDark : const Color(0xFFF5F5F7),
                 borderRadius: BorderRadius.circular(25),
                 border: Border.all(
-                  color: isDark ? AppColors.dividerDark : const Color(0xFFE8E8EC),
+                  color: isDark
+                      ? AppColors.dividerDark
+                      : const Color(0xFFE8E8EC),
                 ),
               ),
               child: TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
-                  hintText: '${l.searchForMedicine} ${widget.category}...',
+                  hintText: '${l.searchForMedicine} ${l.categoryDisplay(widget.category)}...',
                   hintStyle: AppTypography.bodyLarge.copyWith(
                     color: colors.onSurfaceVariant,
                   ),
@@ -90,43 +138,38 @@ class _CategoryMedicinesScreenState extends ConsumerState<CategoryMedicinesScree
 
           // ── Medicine List ──
           Expanded(
-            child: ListView.separated(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-              itemCount: dummyMedicines.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 16),
-              itemBuilder: (context, index) {
-                final med = dummyMedicines[index];
-                return _CategoryMedicineCard(
-                  name: med.name,
-                  qty: med.qty,
-                  unit: med.unit,
-                  condition: med.condition,
-                  onRequestTap: () {
-                    // Navigate to request form with pre-filled category if needed
-                    context.pushNamed(RouteNames.requestForm);
-                  },
-                );
-              },
-            ),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _error != null
+                ? Center(child: Text(_error!))
+                : medicines.isEmpty
+                ? Center(child: Text(l.noMedicinesFound))
+                : ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+                    itemCount: medicines.length,
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 16),
+                    itemBuilder: (context, index) {
+                      final med = medicines[index];
+                      return _CategoryMedicineCard(
+                        name: med.localizedName(l.locale.languageCode),
+                        qty: med.quantity,
+                        unit: med.unit,
+                        condition: med.condition,
+                        onRequestTap: () {
+                          context.pushNamed(
+                            RouteNames.medicineDetails,
+                            pathParameters: {'id': med.id},
+                          );
+                        },
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
-}
-
-class _DummyMed {
-  final String name;
-  final int qty;
-  final String unit;
-  final String condition;
-
-  _DummyMed({
-    required this.name,
-    required this.qty,
-    required this.unit,
-    required this.condition,
-  });
 }
 
 class _CategoryMedicineCard extends StatelessWidget {
@@ -189,7 +232,7 @@ class _CategoryMedicineCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              
+
               // Details
               Expanded(
                 child: Column(
@@ -201,6 +244,8 @@ class _CategoryMedicineCard extends StatelessWidget {
                         color: colors.onSurface,
                         fontWeight: FontWeight.w700,
                       ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
                     Wrap(
@@ -226,14 +271,11 @@ class _CategoryMedicineCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Request Button
           SizedBox(
             width: double.infinity,
-            child: AppButton(
-              label: l.requestMedicine,
-              onPressed: onRequestTap,
-            ),
+            child: AppButton(label: l.requestMedicine, onPressed: onRequestTap),
           ),
         ],
       ),
@@ -279,6 +321,8 @@ class _Badge extends StatelessWidget {
               color: isHighlight ? colors.secondary : colors.onSurfaceVariant,
               fontWeight: FontWeight.w600,
             ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

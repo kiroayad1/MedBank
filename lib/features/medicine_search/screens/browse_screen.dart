@@ -87,7 +87,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
             if (state.isLoading)
               const SliverToBoxAdapter(
                 child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 24),
+                  padding: AppSpacing.screenPadding,
                   child: ShimmerMedicineList(count: 4),
                 ),
               )
@@ -95,14 +95,15 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
               SliverFillRemaining(
                 hasScrollBody: false,
                 child: _EmptyState(
-                  hasFilters: state.searchQuery.isNotEmpty ||
+                  hasFilters:
+                      state.searchQuery.isNotEmpty ||
                       state.selectedCategory != null,
                   onClear: notifier.clearFilters,
                 ),
               )
             else
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+                padding: AppSpacing.screenPadding,
                 sliver: SliverList.separated(
                   itemCount: state.filteredMedicines.length,
                   separatorBuilder: (context, index) => AppSpacing.gapMd,
@@ -121,9 +122,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
               ),
 
             // Bottom padding
-            const SliverToBoxAdapter(
-              child: SizedBox(height: 100),
-            ),
+            const SliverToBoxAdapter(child: SizedBox(height: 100)),
           ],
         ),
       ),
@@ -199,10 +198,7 @@ class _AnimatedMedicineCardState extends State<_AnimatedMedicineCard>
 
 /// Search bar matching reference design.
 class _SearchBar extends StatelessWidget {
-  const _SearchBar({
-    required this.controller,
-    required this.onChanged,
-  });
+  const _SearchBar({required this.controller, required this.onChanged});
 
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -258,9 +254,17 @@ class _CategoryDropdown extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l = context.l10n;
+    final categoryItems = l.browseCategoryItems;
+
+    // Defensive: only set initialValue if it exists in the items
+    final validInitial = selectedCategory != null &&
+        categoryItems.any((e) => e.value == selectedCategory)
+        ? selectedCategory
+        : null;
 
     return DropdownButtonFormField<String>(
-      initialValue: selectedCategory,
+      key: ValueKey('category_dropdown_${validInitial ?? "null"}_${l.locale.languageCode}'),
+      initialValue: validInitial,
       decoration: InputDecoration(
         filled: true,
         fillColor: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
@@ -293,13 +297,7 @@ class _CategoryDropdown extends StatelessWidget {
             ),
           ),
         ),
-        ...{
-          l.catAntibiotics: 'Antibiotics',
-          l.catPainRelief: 'Pain Relief',
-          l.catVitamins: 'Vitamins',
-          l.catChronicCare: 'Chronic Care',
-          l.catFirstAid: 'First Aid',
-        }.entries.map(
+        ...categoryItems.map(
           (entry) => DropdownMenuItem(
             value: entry.value,
             child: Text(
@@ -318,10 +316,7 @@ class _CategoryDropdown extends StatelessWidget {
 
 /// Empty state when no medicines match filters.
 class _EmptyState extends StatelessWidget {
-  const _EmptyState({
-    required this.hasFilters,
-    required this.onClear,
-  });
+  const _EmptyState({required this.hasFilters, required this.onClear});
 
   final bool hasFilters;
   final VoidCallback onClear;
@@ -349,10 +344,7 @@ class _EmptyState extends StatelessWidget {
             ),
             if (hasFilters) ...[
               AppSpacing.gapXxl,
-              TextButton(
-                onPressed: onClear,
-                child: Text(l.clearFilters),
-              ),
+              TextButton(onPressed: onClear, child: Text(l.clearFilters)),
             ],
           ],
         ),

@@ -14,7 +14,10 @@ class S {
   static const _localizedValues = <String, Map<String, String>>{
     // ── App Identity ──
     'appName': {'en': 'Medicine Bank', 'ar': 'بنك الدواء'},
-    'appTagline': {'en': 'Connecting medicine to those in need', 'ar': 'نوصل الدواء لمن يحتاج'},
+    'appTagline': {
+      'en': 'Connecting medicine to those in need',
+      'ar': 'نوصل الدواء لمن يحتاج',
+    },
 
     // ── Bottom Navigation ──
     'home': {'en': 'Home', 'ar': 'الرئيسية'},
@@ -23,17 +26,32 @@ class S {
 
     // ── Home Screen ──
     'welcomeBack': {'en': 'Welcome Back 👋', 'ar': '👋 مرحباً بعودتك'},
-    'whatToDo': {'en': 'What would you like to do today?', 'ar': 'ماذا تريد أن تفعل اليوم؟'},
+    'whatToDo': {
+      'en': 'What would you like to do today?',
+      'ar': 'ماذا تريد أن تفعل اليوم؟',
+    },
     'donateMedicine': {'en': 'Donate Medicine', 'ar': 'تبرع بدواء'},
-    'donateSubtitle': {'en': 'Share your unused medicines with those in need', 'ar': 'شارك أدويتك غير المستخدمة مع المحتاجين'},
+    'donateSubtitle': {
+      'en': 'Share your unused medicines with those in need',
+      'ar': 'شارك أدويتك غير المستخدمة مع المحتاجين',
+    },
     'requestMedicine': {'en': 'Request Medicine', 'ar': 'اطلب دواء'},
-    'requestSubtitle': {'en': 'Find and request the medicines you need', 'ar': 'ابحث واطلب الأدوية التي تحتاجها'},
+    'requestSubtitle': {
+      'en': 'Find and request the medicines you need',
+      'ar': 'ابحث واطلب الأدوية التي تحتاجها',
+    },
     'browseAvailable': {'en': 'Browse Available', 'ar': 'تصفح المتاح'},
-    'browseSubtitle': {'en': 'See all medicines donated by the community', 'ar': 'شاهد جميع الأدوية المتبرع بها'},
+    'browseSubtitle': {
+      'en': 'See all medicines donated by the community',
+      'ar': 'شاهد جميع الأدوية المتبرع بها',
+    },
 
     // ── Auth ──
     'profileLogin': {'en': 'Profile Login', 'ar': 'تسجيل الدخول'},
-    'loginSubtitle': {'en': 'Enter your phone number and password to log in', 'ar': 'أدخل رقم هاتفك وكلمة المرور لتسجيل الدخول'},
+    'loginSubtitle': {
+      'en': 'Enter your phone number and password to log in',
+      'ar': 'أدخل رقم هاتفك وكلمة المرور لتسجيل الدخول',
+    },
     'phoneNumber': {'en': 'Phone Number', 'ar': 'رقم الهاتف'},
     'password': {'en': 'Password', 'ar': 'كلمة المرور'},
     'forgotPassword': {'en': 'Forgot Password?', 'ar': 'نسيت كلمة المرور؟'},
@@ -41,29 +59,57 @@ class S {
     'noAccount': {'en': "Don't have an account? ", 'ar': 'ليس لديك حساب؟ '},
     'signUp': {'en': 'Sign Up', 'ar': 'إنشاء حساب'},
     'signUpTitle': {'en': 'Sign up', 'ar': 'إنشاء حساب'},
-    'signUpSubtitle': {'en': 'Create an account to continue!', 'ar': 'أنشئ حساباً للمتابعة!'},
+    'signUpSubtitle': {
+      'en': 'Create an account to continue!',
+      'ar': 'أنشئ حساباً للمتابعة!',
+    },
     'fullName': {'en': 'Full Name', 'ar': 'الاسم الكامل'},
     'setPassword': {'en': 'Set Password', 'ar': 'تعيين كلمة المرور'},
     'confirmPassword': {'en': 'Confirm Password', 'ar': 'تأكيد كلمة المرور'},
     'register': {'en': 'Register', 'ar': 'تسجيل'},
-    'alreadyAccount': {'en': 'Already have an account? ', 'ar': 'لديك حساب بالفعل؟ '},
+    'alreadyAccount': {
+      'en': 'Already have an account? ',
+      'ar': 'لديك حساب بالفعل؟ ',
+    },
     'login': {'en': 'Login', 'ar': 'دخول'},
     'forgotPasswordTitle': {'en': 'Forget Password', 'ar': 'نسيت كلمة المرور'},
-    'forgotPasswordSubtitle': {'en': 'Please enter Your Phone number To Receive a Verification Code', 'ar': 'أدخل رقم هاتفك لتلقي رمز التحقق'},
+    'forgotPasswordSubtitle': {
+      'en': 'Please enter Your Phone number To Receive a Verification Code',
+      'ar': 'أدخل رقم هاتفك لتلقي رمز التحقق',
+    },
     'resetPassword': {'en': 'Reset Password', 'ar': 'إعادة تعيين كلمة المرور'},
     'tryAnotherWay': {'en': 'Try Another Way?', 'ar': 'جرب طريقة أخرى؟'},
-    'createNewPassword': {'en': 'Create a New Password', 'ar': 'إنشاء كلمة مرور جديدة'},
-    'createPasswordSubtitle': {'en': 'Your New Password Must be Different From Previously Used Password', 'ar': 'يجب أن تكون كلمة المرور الجديدة مختلفة عن كلمة المرور المستخدمة سابقاً'},
+    'createNewPassword': {
+      'en': 'Create a New Password',
+      'ar': 'إنشاء كلمة مرور جديدة',
+    },
+    'createPasswordSubtitle': {
+      'en': 'Your New Password Must be Different From Previously Used Password',
+      'ar':
+          'يجب أن تكون كلمة المرور الجديدة مختلفة عن كلمة المرور المستخدمة سابقاً',
+    },
     'newPassword': {'en': 'New Password', 'ar': 'كلمة المرور الجديدة'},
 
     // ── Browse ──
-    'availableMedicines': {'en': 'Available Medicines', 'ar': 'الأدوية المتاحة'},
-    'browseDescription': {'en': 'Browse and request Medicines donated by our community members', 'ar': 'تصفح واطلب الأدوية المتبرع بها من أعضاء مجتمعنا'},
+    'availableMedicines': {
+      'en': 'Available Medicines',
+      'ar': 'الأدوية المتاحة',
+    },
+    'browseDescription': {
+      'en': 'Browse and request Medicines donated by our community members',
+      'ar': 'تصفح واطلب الأدوية المتبرع بها من أعضاء مجتمعنا',
+    },
     'searchMedicines': {'en': 'Search medicines...', 'ar': 'ابحث عن أدوية...'},
     'category': {'en': 'Category', 'ar': 'الفئة'},
     'allCategories': {'en': 'All Categories', 'ar': 'جميع الفئات'},
-    'noMedicinesFound': {'en': 'No medicines found', 'ar': 'لم يتم العثور على أدوية'},
-    'noMedicinesAvailable': {'en': 'No medicines available', 'ar': 'لا توجد أدوية متاحة'},
+    'noMedicinesFound': {
+      'en': 'No medicines found',
+      'ar': 'لم يتم العثور على أدوية',
+    },
+    'noMedicinesAvailable': {
+      'en': 'No medicines available',
+      'ar': 'لا توجد أدوية متاحة',
+    },
     'clearFilters': {'en': 'Clear Filters', 'ar': 'مسح الفلاتر'},
 
     // ── Donate ──
@@ -85,7 +131,10 @@ class S {
     'continueToRequest': {'en': 'Continue to Request', 'ar': 'المتابعة للطلب'},
     'requestDetails': {'en': 'Request Details', 'ar': 'تفاصيل الطلب'},
     'contactNumber': {'en': 'Contact Number', 'ar': 'رقم التواصل'},
-    'deliveryLocation': {'en': 'Delivery/Pickup Location', 'ar': 'موقع التوصيل/الاستلام'},
+    'deliveryLocation': {
+      'en': 'Delivery/Pickup Location',
+      'ar': 'موقع التوصيل/الاستلام',
+    },
 
     // ── Profile ──
     'memberSince': {'en': 'Member since', 'ar': 'عضو منذ'},
@@ -100,7 +149,10 @@ class S {
     'changePassword': {'en': 'Change Password', 'ar': 'تغيير كلمة المرور'},
     'settings': {'en': 'Settings', 'ar': 'الإعدادات'},
     'logOut': {'en': 'Log Out', 'ar': 'تسجيل الخروج'},
-    'logOutConfirm': {'en': 'Are you sure you want to log out?', 'ar': 'هل أنت متأكد من تسجيل الخروج؟'},
+    'logOutConfirm': {
+      'en': 'Are you sure you want to log out?',
+      'ar': 'هل أنت متأكد من تسجيل الخروج؟',
+    },
     'cancel': {'en': 'Cancel', 'ar': 'إلغاء'},
 
     // ── Settings ──
@@ -113,7 +165,10 @@ class S {
     'termsOfService': {'en': 'Terms of Service', 'ar': 'شروط الخدمة'},
     'privacyPolicy': {'en': 'Privacy Policy', 'ar': 'سياسة الخصوصية'},
     'deleteAccount': {'en': 'Delete Account', 'ar': 'حذف الحساب'},
-    'deleteAccountMsg': {'en': 'Contact support to delete your account.', 'ar': 'تواصل مع الدعم لحذف حسابك.'},
+    'deleteAccountMsg': {
+      'en': 'Contact support to delete your account.',
+      'ar': 'تواصل مع الدعم لحذف حسابك.',
+    },
     'view': {'en': 'View', 'ar': 'عرض'},
 
     // ── Edit Profile ──
@@ -123,9 +178,20 @@ class S {
     'profileUpdated': {'en': 'Profile updated!', 'ar': 'تم تحديث الملف!'},
 
     // ── Success ──
-    'successTitle': {'en': 'Successfully Submitted!', 'ar': 'تم الإرسال بنجاح!'},
-    'donationSuccess': {'en': "Your medicine donation has been registered. We'll notify you when someone requests it.", 'ar': 'تم تسجيل تبرعك بالدواء. سنخبرك عندما يطلبه أحد.'},
-    'requestSuccess': {'en': "Your medicine request has been submitted. We'll match you with available donations.", 'ar': 'تم إرسال طلبك. سنطابقك مع التبرعات المتاحة.'},
+    'successTitle': {
+      'en': 'Successfully Submitted!',
+      'ar': 'تم الإرسال بنجاح!',
+    },
+    'donationSuccess': {
+      'en':
+          "Your medicine donation has been registered. We'll notify you when someone requests it.",
+      'ar': 'تم تسجيل تبرعك بالدواء. سنخبرك عندما يطلبه أحد.',
+    },
+    'requestSuccess': {
+      'en':
+          "Your medicine request has been submitted. We'll match you with available donations.",
+      'ar': 'تم إرسال طلبك. سنطابقك مع التبرعات المتاحة.',
+    },
     'backToHome': {'en': 'Back to Home', 'ar': 'العودة للرئيسية'},
     'viewMyDonations': {'en': 'View My Donations', 'ar': 'عرض تبرعاتي'},
     'viewMyRequests': {'en': 'View My Requests', 'ar': 'عرض طلباتي'},
@@ -142,71 +208,183 @@ class S {
     'selectCondition': {'en': 'Select Condition', 'ar': 'اختر الحالة'},
 
     // ── Donate Guidelines ──
-    'donateGuidelineDesc': {'en': 'Your contribution helps provide critical care to those in need. Please review the guidelines before donating.', 'ar': 'مساهمتك تساعد في توفير رعاية حيوية للمحتاجين. يرجى مراجعة الإرشادات قبل التبرع.'},
-    'sealedUnexpired': {'en': 'Sealed & Unexpired', 'ar': 'مختوم وغير منتهي الصلاحية'},
-    'sealedUnexpiredDesc': {'en': 'Medicine must be in its original, unopened packaging with intact seals.', 'ar': 'يجب أن يكون الدواء في عبوته الأصلية غير المفتوحة مع الأختام سليمة.'},
+    'donateGuidelineDesc': {
+      'en':
+          'Your contribution helps provide critical care to those in need. Please review the guidelines before donating.',
+      'ar':
+          'مساهمتك تساعد في توفير رعاية حيوية للمحتاجين. يرجى مراجعة الإرشادات قبل التبرع.',
+    },
+    'sealedUnexpired': {
+      'en': 'Sealed & Unexpired',
+      'ar': 'مختوم وغير منتهي الصلاحية',
+    },
+    'sealedUnexpiredDesc': {
+      'en':
+          'Medicine must be in its original, unopened packaging with intact seals.',
+      'ar':
+          'يجب أن يكون الدواء في عبوته الأصلية غير المفتوحة مع الأختام سليمة.',
+    },
     'threeMonthsMin': {'en': '3 Months Minimum', 'ar': '3 أشهر كحد أدنى'},
-    'threeMonthsMinDesc': {'en': 'Items must have at least 3 months remaining before their printed expiration date.', 'ar': 'يجب أن يتبقى 3 أشهر على الأقل قبل تاريخ انتهاء الصلاحية.'},
+    'threeMonthsMinDesc': {
+      'en':
+          'Items must have at least 3 months remaining before their printed expiration date.',
+      'ar': 'يجب أن يتبقى 3 أشهر على الأقل قبل تاريخ انتهاء الصلاحية.',
+    },
     'originalPackaging': {'en': 'Original Packaging', 'ar': 'العبوة الأصلية'},
-    'originalPackagingDesc': {'en': 'All donations must include the original manufacturer packaging and information.', 'ar': 'يجب أن تتضمن جميع التبرعات العبوة الأصلية من الشركة المصنعة.'},
-    'donateWarning': {'en': 'Note: We cannot accept temperature-controlled medicines (like insulin) or scheduled narcotics.', 'ar': 'ملاحظة: لا يمكننا قبول الأدوية التي تتطلب تبريد (مثل الأنسولين) أو المواد المخدرة.'},
+    'originalPackagingDesc': {
+      'en':
+          'All donations must include the original manufacturer packaging and information.',
+      'ar': 'يجب أن تتضمن جميع التبرعات العبوة الأصلية من الشركة المصنعة.',
+    },
+    'donateWarning': {
+      'en':
+          'Note: We cannot accept temperature-controlled medicines (like insulin) or scheduled narcotics.',
+      'ar':
+          'ملاحظة: لا يمكننا قبول الأدوية التي تتطلب تبريد (مثل الأنسولين) أو المواد المخدرة.',
+    },
 
     // ── Request Guidelines ──
-    'requestGuidelineDesc': {'en': "Don't hesitate, We are here to help you get the medicine you need.", 'ar': 'لا تتردد، نحن هنا لمساعدتك في الحصول على الدواء الذي تحتاجه.'},
-    'guidelinesForRequesting': {'en': 'Guidelines for Requesting', 'ar': 'إرشادات الطلب'},
+    'requestGuidelineDesc': {
+      'en':
+          "Don't hesitate, We are here to help you get the medicine you need.",
+      'ar': 'لا تتردد، نحن هنا لمساعدتك في الحصول على الدواء الذي تحتاجه.',
+    },
+    'guidelinesForRequesting': {
+      'en': 'Guidelines for Requesting',
+      'ar': 'إرشادات الطلب',
+    },
     'accurateDosage': {'en': 'Accurate Dosage', 'ar': 'الجرعة الدقيقة'},
-    'accurateDosageDesc': {'en': 'Please ensure you provide the exact dosage and quantity needed as prescribed by your doctor.', 'ar': 'يرجى التأكد من تقديم الجرعة والكمية المطلوبة كما وصفها الطبيب.'},
-    'uploadPrescription': {'en': 'Upload Prescription', 'ar': 'رفع الوصفة الطبية'},
-    'uploadPrescriptionDesc': {'en': 'A clear, readable photo or scan of a valid prescription is required for all medicine requests.', 'ar': 'صورة واضحة أو نسخة ممسوحة من وصفة طبية سارية مطلوبة لجميع طلبات الأدوية.'},
+    'accurateDosageDesc': {
+      'en':
+          'Please ensure you provide the exact dosage and quantity needed as prescribed by your doctor.',
+      'ar': 'يرجى التأكد من تقديم الجرعة والكمية المطلوبة كما وصفها الطبيب.',
+    },
+    'uploadPrescription': {
+      'en': 'Upload Prescription',
+      'ar': 'رفع الوصفة الطبية',
+    },
+    'uploadPrescriptionDesc': {
+      'en':
+          'A clear, readable photo or scan of a valid prescription is required for all medicine requests.',
+      'ar':
+          'صورة واضحة أو نسخة ممسوحة من وصفة طبية سارية مطلوبة لجميع طلبات الأدوية.',
+    },
     'honestyIntegrity': {'en': 'Honesty & Integrity', 'ar': 'الصدق والنزاهة'},
-    'honestyIntegrityDesc': {'en': 'Only request medicines you genuinely need to ensure resources are available for all community members.', 'ar': 'اطلب فقط الأدوية التي تحتاجها فعلاً لضمان توفر الموارد لجميع أعضاء المجتمع.'},
+    'honestyIntegrityDesc': {
+      'en':
+          'Only request medicines you genuinely need to ensure resources are available for all community members.',
+      'ar':
+          'اطلب فقط الأدوية التي تحتاجها فعلاً لضمان توفر الموارد لجميع أعضاء المجتمع.',
+    },
     'promptResponse': {'en': 'Prompt Response', 'ar': 'استجابة سريعة'},
-    'promptResponseDesc': {'en': 'We aim to review requests within 24 hours. Please monitor your notifications for updates.', 'ar': 'نهدف لمراجعة الطلبات خلال 24 ساعة. يرجى متابعة الإشعارات للحصول على التحديثات.'},
+    'promptResponseDesc': {
+      'en':
+          'We aim to review requests within 24 hours. Please monitor your notifications for updates.',
+      'ar':
+          'نهدف لمراجعة الطلبات خلال 24 ساعة. يرجى متابعة الإشعارات للحصول على التحديثات.',
+    },
 
     // ── Donate Form ──
-    'donateFormInfo': {'en': 'Please provide accurate details about the medicine you wish to donate to ensure it meets our safety guidelines.', 'ar': 'يرجى تقديم تفاصيل دقيقة عن الدواء الذي ترغب في التبرع به لضمان استيفاء إرشادات السلامة.'},
+    'donateFormInfo': {
+      'en':
+          'Please provide accurate details about the medicine you wish to donate to ensure it meets our safety guidelines.',
+      'ar':
+          'يرجى تقديم تفاصيل دقيقة عن الدواء الذي ترغب في التبرع به لضمان استيفاء إرشادات السلامة.',
+    },
     'medicineNameRequired': {'en': 'Medicine Name *', 'ar': 'اسم الدواء *'},
     'categoryRequired': {'en': 'Category *', 'ar': 'الفئة *'},
     'quantityRequired': {'en': 'Quantity *', 'ar': 'الكمية *'},
     'unitRequired': {'en': 'Unit *', 'ar': 'الوحدة *'},
-    'expirationDateRequired': {'en': 'Expiration Date *', 'ar': 'تاريخ الانتهاء *'},
-    'expiryNote': {'en': 'Medicines must have at least 3 months until expiration.', 'ar': 'يجب أن يتبقى 3 أشهر على الأقل حتى انتهاء الصلاحية.'},
-    'manufacturerOptional': {'en': 'Manufacturer (Optional)', 'ar': 'الشركة المصنعة (اختياري)'},
+    'expirationDateRequired': {
+      'en': 'Expiration Date *',
+      'ar': 'تاريخ الانتهاء *',
+    },
+    'expiryNote': {
+      'en': 'Medicines must have at least 3 months until expiration.',
+      'ar': 'يجب أن يتبقى 3 أشهر على الأقل حتى انتهاء الصلاحية.',
+    },
+    'manufacturerOptional': {
+      'en': 'Manufacturer (Optional)',
+      'ar': 'الشركة المصنعة (اختياري)',
+    },
     'conditionRequired': {'en': 'Condition *', 'ar': 'الحالة *'},
     'locationRequired': {'en': 'Your Location *', 'ar': 'موقعك *'},
 
     // ── Request Form ──
-    'requestFormInfo': {'en': 'Please provide accurate details for the medicine you are requesting. This helps us match your request with available donations quickly.', 'ar': 'يرجى تقديم تفاصيل دقيقة للدواء الذي تطلبه. هذا يساعدنا في مطابقة طلبك مع التبرعات المتاحة بسرعة.'},
+    'requestFormInfo': {
+      'en':
+          'Please provide accurate details for the medicine you are requesting. This helps us match your request with available donations quickly.',
+      'ar':
+          'يرجى تقديم تفاصيل دقيقة للدواء الذي تطلبه. هذا يساعدنا في مطابقة طلبك مع التبرعات المتاحة بسرعة.',
+    },
     'contactRequired': {'en': 'Contact Number *', 'ar': 'رقم التواصل *'},
-    'deliveryRequired': {'en': 'Delivery/Pickup Location *', 'ar': 'موقع التوصيل/الاستلام *'},
+    'deliveryRequired': {
+      'en': 'Delivery/Pickup Location *',
+      'ar': 'موقع التوصيل/الاستلام *',
+    },
 
     // ── Medicine Details ──
     'description': {'en': 'Description', 'ar': 'الوصف'},
     'expiryDate': {'en': 'Expiry Date', 'ar': 'تاريخ الانتهاء'},
-    'requestThisMedicine': {'en': 'Request This Medicine', 'ar': 'اطلب هذا الدواء'},
-    'requestSubmitted': {'en': 'Request submitted! We will notify you.', 'ar': 'تم إرسال الطلب! سنخبرك.'},
+    'requestThisMedicine': {
+      'en': 'Request This Medicine',
+      'ar': 'اطلب هذا الدواء',
+    },
+    'requestSubmitted': {
+      'en': 'Request submitted! We will notify you.',
+      'ar': 'تم إرسال الطلب! سنخبرك.',
+    },
     'unavailable': {'en': 'UNAVAILABLE', 'ar': 'غير متاح'},
 
     // ── Snackbar / Feedback ──
-    'verificationSent': {'en': 'Verification code sent!', 'ar': 'تم إرسال رمز التحقق!'},
-    'passwordUpdated': {'en': 'Password updated successfully!', 'ar': 'تم تحديث كلمة المرور بنجاح!'},
+    'verificationSent': {
+      'en': 'Verification code sent!',
+      'ar': 'تم إرسال رمز التحقق!',
+    },
+    'passwordUpdated': {
+      'en': 'Password updated successfully!',
+      'ar': 'تم تحديث كلمة المرور بنجاح!',
+    },
     'nameRequired': {'en': 'Name is required', 'ar': 'الاسم مطلوب'},
-    'phoneRequired': {'en': 'Phone number is required', 'ar': 'رقم الهاتف مطلوب'},
-    'passwordRequired': {'en': 'Password is required', 'ar': 'كلمة المرور مطلوبة'},
-    'passwordMinLength': {'en': 'Password must be at least 8 characters', 'ar': 'كلمة المرور يجب أن تكون 8 أحرف على الأقل'},
-    'confirmPasswordError': {'en': 'Please confirm your password', 'ar': 'يرجى تأكيد كلمة المرور'},
-    'passwordsNoMatch': {'en': 'Passwords do not match', 'ar': 'كلمات المرور غير متطابقة'},
-    'nameMinLength': {'en': 'Name must be at least 2 characters', 'ar': 'الاسم يجب أن يكون حرفين على الأقل'},
+    'phoneRequired': {
+      'en': 'Phone number is required',
+      'ar': 'رقم الهاتف مطلوب',
+    },
+    'passwordRequired': {
+      'en': 'Password is required',
+      'ar': 'كلمة المرور مطلوبة',
+    },
+    'passwordMinLength': {
+      'en': 'Password must be at least 8 characters',
+      'ar': 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+    },
+    'confirmPasswordError': {
+      'en': 'Please confirm your password',
+      'ar': 'يرجى تأكيد كلمة المرور',
+    },
+    'passwordsNoMatch': {
+      'en': 'Passwords do not match',
+      'ar': 'كلمات المرور غير متطابقة',
+    },
+    'nameMinLength': {
+      'en': 'Name must be at least 2 characters',
+      'ar': 'الاسم يجب أن يكون حرفين على الأقل',
+    },
     'minEightChars': {'en': 'Minimum 8 characters', 'ar': '8 أحرف على الأقل'},
 
     // ── Medicine Card ──
     'qty': {'en': 'Qty', 'ar': 'الكمية'},
     'exp': {'en': 'Exp', 'ar': 'انتهاء'},
 
-    // ── Categories ──
+    // ── Categories (match backend English values) ──
+    'catTablets': {'en': 'Tablets', 'ar': 'أقراص'},
+    'catSyrups': {'en': 'Syrups', 'ar': 'شراب'},
+    'catBabyCare': {'en': 'Baby Care', 'ar': 'عناية بالأطفال'},
+    'catVitamins': {'en': 'Vitamins', 'ar': 'فيتامينات'},
+    'catInjections': {'en': 'Injections', 'ar': 'حقن'},
+    // Legacy aliases for browse dropdown compatibility
     'catAntibiotics': {'en': 'Antibiotics', 'ar': 'مضادات حيوية'},
     'catPainRelief': {'en': 'Pain Relief', 'ar': 'مسكنات الألم'},
-    'catVitamins': {'en': 'Vitamins', 'ar': 'فيتامينات'},
     'catChronicCare': {'en': 'Chronic Care', 'ar': 'رعاية مزمنة'},
     'catFirstAid': {'en': 'First Aid', 'ar': 'إسعافات أولية'},
 
@@ -215,16 +393,31 @@ class S {
     'hintEnterName': {'en': 'Enter your name', 'ar': 'أدخل اسمك'},
 
     // ── Profile placeholders ──
-    'medicinesDonated': {'en': 'medicines donated', 'ar': 'أدوية تم التبرع بها'},
+    'medicinesDonated': {
+      'en': 'medicines donated',
+      'ar': 'أدوية تم التبرع بها',
+    },
     'medicinesRequested': {'en': 'medicines requested', 'ar': 'أدوية تم طلبها'},
 
     // ── Form Hints ──
-    'hintMedicineExample': {'en': 'e.g. Amoxicillin, Paracetamol', 'ar': 'مثال: أموكسيسيلين، باراسيتامول'},
-    'hintMedicineWithDose': {'en': 'e.g. Amoxicillin 500mg', 'ar': 'مثال: أموكسيسيلين 500 مجم'},
+    'hintMedicineExample': {
+      'en': 'e.g. Amoxicillin, Paracetamol',
+      'ar': 'مثال: أموكسيسيلين، باراسيتامول',
+    },
+    'hintMedicineWithDose': {
+      'en': 'e.g. Amoxicillin 500mg',
+      'ar': 'مثال: أموكسيسيلين 500 مجم',
+    },
     'hintManufacturer': {'en': 'e.g. Pfizer, GSK', 'ar': 'مثال: فايزر، GSK'},
-    'hintSpecificBrand': {'en': 'Specific brand if required', 'ar': 'علامة تجارية محددة إن لزم'},
+    'hintSpecificBrand': {
+      'en': 'Specific brand if required',
+      'ar': 'علامة تجارية محددة إن لزم',
+    },
     'hintCityArea': {'en': 'City, Area', 'ar': 'المدينة، المنطقة'},
-    'hintFullAddress': {'en': 'Enter full address or preferred clinic', 'ar': 'أدخل العنوان الكامل أو العيادة المفضلة'},
+    'hintFullAddress': {
+      'en': 'Enter full address or preferred clinic',
+      'ar': 'أدخل العنوان الكامل أو العيادة المفضلة',
+    },
     'hintPhone': {'en': '100 123 4567', 'ar': '100 123 4567'},
     'hintPhoneIntl': {'en': '+20 100 000 0000', 'ar': '+20 100 000 0000'},
     'hintDateFormat': {'en': 'mm/dd/yyyy', 'ar': 'yyyy/mm/dd'},
@@ -237,8 +430,14 @@ class S {
     // ── Empty States ──
     'noDonationsYet': {'en': 'No donations yet', 'ar': 'لا توجد تبرعات بعد'},
     'noRequestsYet': {'en': 'No requests yet', 'ar': 'لا توجد طلبات بعد'},
-    'startDonating': {'en': 'Start by donating medicine to the community', 'ar': 'ابدأ بالتبرع بالأدوية للمجتمع'},
-    'startRequesting': {'en': 'Browse medicines and make your first request', 'ar': 'تصفح الأدوية وقدم طلبك الأول'},
+    'startDonating': {
+      'en': 'Start by donating medicine to the community',
+      'ar': 'ابدأ بالتبرع بالأدوية للمجتمع',
+    },
+    'startRequesting': {
+      'en': 'Browse medicines and make your first request',
+      'ar': 'تصفح الأدوية وقدم طلبك الأول',
+    },
 
     // ── Medicine Form Dropdown Options ──
     'formCatAntibiotic': {'en': 'Antibiotic', 'ar': 'مضاد حيوي'},
@@ -263,8 +462,14 @@ class S {
     'condNew': {'en': 'New', 'ar': 'جديد'},
 
     // ── Request Medicine Screen (new design) ──
-    'requestSubtitleMotivation': {'en': "Don't hesitate, We are here\nto help you", 'ar': 'لا تتردد، نحن هنا\nلمساعدتك'},
-    'searchForMedicine': {'en': 'Search for a medicine...', 'ar': 'ابحث عن دواء...'},
+    'requestSubtitleMotivation': {
+      'en': "Don't hesitate, We are here\nto help you",
+      'ar': 'لا تتردد، نحن هنا\nلمساعدتك',
+    },
+    'searchForMedicine': {
+      'en': 'Search for a medicine...',
+      'ar': 'ابحث عن دواء...',
+    },
     'withMedicineImage': {'en': 'With medicine image', 'ar': 'بصورة الدواء'},
     'withPrescription': {'en': 'With Prescription', 'ar': 'بالروشتة'},
     'catDiabetes': {'en': 'Diabetes', 'ar': 'السكري'},
@@ -276,11 +481,32 @@ class S {
 
     // ── Order Confirmation ──
     'orderList': {'en': 'Order List', 'ar': 'قائمة الطلب'},
-    'medicinesOriginalPrice': {'en': 'Medicines Original Price', 'ar': 'السعر الأصلي للأدوية'},
+    'medicinesOriginalPrice': {
+      'en': 'Medicines Original Price',
+      'ar': 'السعر الأصلي للأدوية',
+    },
     'shippingFees': {'en': 'Shipping Fees', 'ar': 'رسوم الشحن'},
     'totalToPay': {'en': 'Total To Pay', 'ar': 'الإجمالي للدفع'},
     'confirmOrder': {'en': 'Confirm Order', 'ar': 'تأكيد الطلب'},
     'egp': {'en': 'EGP', 'ar': 'ج.م'},
+
+    // ── Common Actions & Errors ──
+    'camera': {'en': 'Camera', 'ar': 'الكاميرا'},
+    'gallery': {'en': 'Gallery', 'ar': 'المعرض'},
+    'submitRequestError': {
+      'en': 'Failed to submit request',
+      'ar': 'فشل إرسال الطلب',
+    },
+    'pickImageError': {
+      'en': 'Error picking image',
+      'ar': 'خطأ في اختيار الصورة',
+    },
+    'selectExpiryError': {
+      'en': 'Please select an expiry date',
+      'ar': 'يرجى اختيار تاريخ الانتهاء',
+    },
+    'donateError': {'en': 'Failed to donate', 'ar': 'فشل التبرع'},
+    'reference': {'en': 'REF', 'ar': 'رقم'},
   };
 
   String _t(String key) {
@@ -473,6 +699,13 @@ class S {
   String get catVitamins => _t('catVitamins');
   String get catChronicCare => _t('catChronicCare');
   String get catFirstAid => _t('catFirstAid');
+  // New backend-aligned categories
+  // New backend-aligned categories
+  String get catTablets => _t('catTablets');
+  String get catSyrups => _t('catSyrups');
+  String get catBabyCare => _t('catBabyCare');
+  String get catInjections => _t('catInjections');
+  // catDiabetes, catStomachDigestion, catChronicDiseases defined below
 
   // Hints
   String get hintFullName => _t('hintFullName');
@@ -506,15 +739,28 @@ class S {
 
   // Medicine Form Dropdown Options (as lists)
   List<String> get formCategories => [
-    _t('formCatAntibiotic'), _t('formCatPainkiller'), _t('formCatDiabetes'),
-    _t('formCatVitamins'), _t('formCatHeart'), _t('formCatAllergy'), _t('formCatOther'),
+    _t('formCatAntibiotic'),
+    _t('formCatPainkiller'),
+    _t('formCatDiabetes'),
+    _t('formCatVitamins'),
+    _t('formCatHeart'),
+    _t('formCatAllergy'),
+    _t('formCatOther'),
   ];
   List<String> get formUnits => [
-    _t('unitTablets'), _t('unitCapsules'), _t('unitBottles'),
-    _t('unitBoxes'), _t('unitStrips'), _t('unitVials'), _t('unitTubes'),
+    _t('unitTablets'),
+    _t('unitCapsules'),
+    _t('unitBottles'),
+    _t('unitBoxes'),
+    _t('unitStrips'),
+    _t('unitVials'),
+    _t('unitTubes'),
   ];
   List<String> get formConditions => [
-    _t('condSealed'), _t('condUnopened'), _t('condPartiallyUsed'), _t('condNew'),
+    _t('condSealed'),
+    _t('condUnopened'),
+    _t('condPartiallyUsed'),
+    _t('condNew'),
   ];
   String get unitTablets => _t('unitTablets');
   String get unitCapsules => _t('unitCapsules');
@@ -542,6 +788,47 @@ class S {
   String get totalToPay => _t('totalToPay');
   String get confirmOrder => _t('confirmOrder');
   String get egp => _t('egp');
+
+  // Common Actions & Errors
+  String get camera => _t('camera');
+  String get gallery => _t('gallery');
+  String get submitRequestError => _t('submitRequestError');
+  String get pickImageError => _t('pickImageError');
+  String get selectExpiryError => _t('selectExpiryError');
+  String get donateError => _t('donateError');
+  String get reference => _t('reference');
+
+  /// Backend category value ↔ Arabic display mapping.
+  /// Keys are backend English values; values are localized Arabic display text.
+  static const _backendCategories = <String, String>{
+    'Tablets': 'أقراص',
+    'Syrups': 'شراب',
+    'Baby Care': 'عناية بالأطفال',
+    'Vitamins': 'فيتامينات',
+    'Injections': 'حقن',
+    'Diabetes': 'السكري',
+    'Stomach & Digestion': 'المعدة والهضم',
+    'Chronic Diseases': 'أمراض مزمنة',
+  };
+
+  /// Returns the Arabic display text for a backend English category value.
+  String categoryDisplay(String backendValue) {
+    if (locale.languageCode == 'ar') {
+      return _backendCategories[backendValue] ?? backendValue;
+    }
+    return backendValue;
+  }
+
+  /// The list of backend category English values.
+  List<String> get backendCategories => _backendCategories.keys.toList();
+
+  /// Dropdown items for browse screen: Arabic display -> English backend value.
+  List<MapEntry<String, String>> get browseCategoryItems {
+    return _backendCategories.entries.map((e) {
+      final display = locale.languageCode == 'ar' ? e.value : e.key;
+      return MapEntry(display, e.key);
+    }).toList();
+  }
 }
 
 /// Delegate for loading [S] localizations.
@@ -549,8 +836,7 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<S> {
   const AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      ['en', 'ar'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => ['en', 'ar'].contains(locale.languageCode);
 
   @override
   Future<S> load(Locale locale) async => S(locale);

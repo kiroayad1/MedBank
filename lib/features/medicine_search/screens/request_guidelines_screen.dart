@@ -22,9 +22,10 @@ class RequestGuidelinesScreen extends StatelessWidget {
       );
       if (image != null && context.mounted) {
         // Navigate to form and pass the image path
-        context.pushNamed(RouteNames.requestForm, queryParameters: {
-          'imagePath': image.path,
-        });
+        context.pushNamed(
+          RouteNames.requestForm,
+          queryParameters: {'imagePath': image.path},
+        );
       }
     } catch (e) {
       if (context.mounted) {
@@ -47,7 +48,7 @@ class RequestGuidelinesScreen extends StatelessWidget {
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt_rounded),
-              title: const Text('Camera'),
+              title: Text(context.l10n.camera),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickImage(context, ImageSource.camera);
@@ -55,7 +56,7 @@ class RequestGuidelinesScreen extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library_rounded),
-              title: const Text('Gallery'),
+              title: Text(context.l10n.gallery),
               onTap: () {
                 Navigator.pop(ctx);
                 _pickImage(context, ImageSource.gallery);
@@ -94,7 +95,10 @@ class RequestGuidelinesScreen extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [colors.primary, colors.primary.withValues(alpha: 0.7)],
+                    colors: [
+                      colors.primary,
+                      colors.primary.withValues(alpha: 0.7),
+                    ],
                   ),
                   shape: BoxShape.circle,
                   boxShadow: [
@@ -134,10 +138,14 @@ class RequestGuidelinesScreen extends StatelessWidget {
               // ── Search Bar ──
               Container(
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : const Color(0xFFF5F5F7),
+                  color: isDark
+                      ? AppColors.surfaceDark
+                      : const Color(0xFFF5F5F7),
                   borderRadius: BorderRadius.circular(25),
                   border: Border.all(
-                    color: isDark ? AppColors.dividerDark : const Color(0xFFE8E8EC),
+                    color: isDark
+                        ? AppColors.dividerDark
+                        : const Color(0xFFE8E8EC),
                   ),
                 ),
                 child: TextField(
@@ -193,44 +201,74 @@ class RequestGuidelinesScreen extends StatelessWidget {
                   _CategoryCard(
                     title: l.catDiabetes,
                     icon: Icons.bloodtype_outlined,
-                    bgColor: isDark ? const Color(0xFF3D1F22) : const Color(0xFFF9D1D5),
+                    bgColor: isDark
+                        ? const Color(0xFF3D1F22)
+                        : const Color(0xFFF9D1D5),
                     iconColor: const Color(0xFFD64550),
-                    onTap: () => context.pushNamed(RouteNames.categoryMedicines, pathParameters: {'category': l.catDiabetes}),
+                    onTap: () => context.pushNamed(
+                      RouteNames.categoryMedicines,
+                      pathParameters: {'category': 'Diabetes'},
+                    ),
                   ),
                   _CategoryCard(
                     title: l.catChronicDiseases,
                     icon: Icons.favorite_border_rounded,
-                    bgColor: isDark ? const Color(0xFF3A1A1B) : const Color(0xFFF5A3A4),
+                    bgColor: isDark
+                        ? const Color(0xFF3A1A1B)
+                        : const Color(0xFFF5A3A4),
                     iconColor: const Color(0xFFA1171A),
-                    onTap: () => context.pushNamed(RouteNames.categoryMedicines, pathParameters: {'category': l.catChronicDiseases}),
+                    onTap: () => context.pushNamed(
+                      RouteNames.categoryMedicines,
+                      pathParameters: {'category': 'Chronic Diseases'},
+                    ),
                   ),
                   _CategoryCard(
                     title: l.catPainkillers,
                     icon: Icons.bolt_outlined,
-                    bgColor: isDark ? const Color(0xFF3A3520) : const Color(0xFFEBE0A6),
+                    bgColor: isDark
+                        ? const Color(0xFF3A3520)
+                        : const Color(0xFFEBE0A6),
                     iconColor: const Color(0xFFB59A27),
-                    onTap: () => context.pushNamed(RouteNames.categoryMedicines, pathParameters: {'category': l.catPainkillers}),
+                    onTap: () => context.pushNamed(
+                      RouteNames.categoryMedicines,
+                      pathParameters: {'category': 'Tablets'},
+                    ),
                   ),
                   _CategoryCard(
                     title: l.catAntibioticsGrid,
                     icon: Icons.medication_liquid_outlined,
-                    bgColor: isDark ? const Color(0xFF2D1F3A) : const Color(0xFFD6B9E8),
+                    bgColor: isDark
+                        ? const Color(0xFF2D1F3A)
+                        : const Color(0xFFD6B9E8),
                     iconColor: const Color(0xFF8B1FA9),
-                    onTap: () => context.pushNamed(RouteNames.categoryMedicines, pathParameters: {'category': l.catAntibioticsGrid}),
+                    onTap: () => context.pushNamed(
+                      RouteNames.categoryMedicines,
+                      pathParameters: {'category': 'Syrups'},
+                    ),
                   ),
                   _CategoryCard(
                     title: l.catBloodPressure,
                     icon: Icons.medical_services_outlined,
-                    bgColor: isDark ? const Color(0xFF352825) : const Color(0xFFDFBDB9),
+                    bgColor: isDark
+                        ? const Color(0xFF352825)
+                        : const Color(0xFFDFBDB9),
                     iconColor: isDark ? Colors.white70 : Colors.black87,
-                    onTap: () => context.pushNamed(RouteNames.categoryMedicines, pathParameters: {'category': l.catBloodPressure}),
+                    onTap: () => context.pushNamed(
+                      RouteNames.categoryMedicines,
+                      pathParameters: {'category': 'Injections'},
+                    ),
                   ),
                   _CategoryCard(
                     title: l.catSkinCare,
                     icon: Icons.health_and_safety_outlined,
-                    bgColor: isDark ? const Color(0xFF352D22) : const Color(0xFFE5C5AB),
+                    bgColor: isDark
+                        ? const Color(0xFF352D22)
+                        : const Color(0xFFE5C5AB),
                     iconColor: const Color(0xFFB34A29),
-                    onTap: () => context.pushNamed(RouteNames.categoryMedicines, pathParameters: {'category': l.catSkinCare}),
+                    onTap: () => context.pushNamed(
+                      RouteNames.categoryMedicines,
+                      pathParameters: {'category': 'Baby Care'},
+                    ),
                   ),
                 ],
               ),

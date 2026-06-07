@@ -32,9 +32,9 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
     await Future.delayed(const Duration(seconds: 1));
     setState(() => _isLoading = false);
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(context.l10n.passwordUpdated)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(context.l10n.passwordUpdated)));
       Navigator.of(context).pop();
     }
   }
@@ -57,12 +57,12 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
               : AppColors.backgroundGradient,
         ),
         child: SafeArea(
-          child: Column(
-            children: [
-              const Spacer(flex: 2),
-              Padding(
-                padding: AppSpacing.screenPadding,
-                child: Container(
+          child: SingleChildScrollView(
+            padding: AppSpacing.screenPadding,
+            child: Column(
+              children: [
+                AppSpacing.gapXxl,
+                Container(
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.cardDark : AppColors.cardLight,
@@ -142,9 +142,9 @@ class _CreatePasswordScreenState extends State<CreatePasswordScreen> {
                     ),
                   ),
                 ),
-              ),
-              const Spacer(flex: 3),
-            ],
+                AppSpacing.gapSection,
+              ],
+            ),
           ),
         ),
       ),

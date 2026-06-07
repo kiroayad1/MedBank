@@ -18,9 +18,21 @@ class DonateGuidelinesScreen extends StatelessWidget {
     final l = context.l10n;
 
     final guidelines = [
-      _Guideline(title: l.sealedUnexpired, description: l.sealedUnexpiredDesc, icon: Icons.check_circle_rounded),
-      _Guideline(title: l.threeMonthsMin, description: l.threeMonthsMinDesc, icon: Icons.check_circle_rounded),
-      _Guideline(title: l.originalPackaging, description: l.originalPackagingDesc, icon: Icons.check_circle_rounded),
+      _Guideline(
+        title: l.sealedUnexpired,
+        description: l.sealedUnexpiredDesc,
+        icon: Icons.check_circle_rounded,
+      ),
+      _Guideline(
+        title: l.threeMonthsMin,
+        description: l.threeMonthsMinDesc,
+        icon: Icons.check_circle_rounded,
+      ),
+      _Guideline(
+        title: l.originalPackaging,
+        description: l.originalPackagingDesc,
+        icon: Icons.check_circle_rounded,
+      ),
     ];
 
     return Scaffold(
@@ -38,7 +50,7 @@ class DonateGuidelinesScreen extends StatelessWidget {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 32),
                     decoration: BoxDecoration(
-                      gradient: AppColors.heroGradient,
+                      gradient: isDark ? AppColors.darkHeroGradient : AppColors.heroGradient,
                     ),
                     child: Column(
                       children: [
@@ -83,10 +95,13 @@ class DonateGuidelinesScreen extends StatelessWidget {
                     child: Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.cardDark : AppColors.cardLight,
+                        color: isDark
+                            ? AppColors.cardDark
+                            : AppColors.cardLight,
                         borderRadius: AppShapes.borderRadiusLg,
-                        boxShadow:
-                            isDark ? AppShadows.cardDark : AppShadows.cardLight,
+                        boxShadow: isDark
+                            ? AppShadows.cardDark
+                            : AppShadows.cardLight,
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -99,10 +114,14 @@ class DonateGuidelinesScreen extends StatelessWidget {
                                 size: 24,
                               ),
                               AppSpacing.gapHSm,
-                              Text(
-                                l.importantGuidelines,
-                                style: AppTypography.headlineSmall.copyWith(
-                                  color: colors.onSurface,
+                              Expanded(
+                                child: Text(
+                                  l.importantGuidelines,
+                                  style: AppTypography.headlineSmall.copyWith(
+                                    color: colors.onSurface,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
@@ -121,11 +140,11 @@ class DonateGuidelinesScreen extends StatelessWidget {
 
                   // ── Warning Note ──
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    padding: AppSpacing.screenPadding,
                     child: Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: AppColors.warningLight,
+                        color: isDark ? AppColors.warning.withValues(alpha: 0.15) : AppColors.warningLight,
                         borderRadius: AppShapes.borderRadiusMd,
                       ),
                       child: Row(
@@ -141,7 +160,7 @@ class DonateGuidelinesScreen extends StatelessWidget {
                             child: Text(
                               l.donateWarning,
                               style: AppTypography.bodySmall.copyWith(
-                                color: const Color(0xFF92400E),
+                                color: isDark ? colors.onSurface : const Color(0xFF92400E),
                               ),
                             ),
                           ),
@@ -159,7 +178,7 @@ class DonateGuidelinesScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
+              color: isDark ? colors.surface : AppColors.surfaceLight,
             ),
             child: SafeArea(
               top: false,
@@ -199,11 +218,7 @@ class _GuidelineItem extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(
-          guideline.icon,
-          color: AppColors.success,
-          size: 22,
-        ),
+        Icon(guideline.icon, color: AppColors.success, size: 22),
         AppSpacing.gapHMd,
         Expanded(
           child: Column(

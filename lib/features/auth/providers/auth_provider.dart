@@ -1,4 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/network/api_config.dart';
+import '../../../core/network/api_exception.dart';
+import '../../../core/network/services/auth_service.dart';
 
 /// Authentication state.
 enum AuthStatus { unknown, unauthenticated, authenticated }
@@ -8,11 +11,15 @@ class AuthState {
     this.status = AuthStatus.unknown,
     this.isLoading = false,
     this.errorMessage,
+    this.fullName,
+    this.phoneNumber,
   });
 
   final AuthStatus status;
   final bool isLoading;
   final String? errorMessage;
+  final String? fullName;
+  final String? phoneNumber;
 
   bool get isAuthenticated => status == AuthStatus.authenticated;
   bool get hasError => errorMessage != null;
@@ -21,11 +28,15 @@ class AuthState {
     AuthStatus? status,
     bool? isLoading,
     String? Function()? errorMessage,
+    String? fullName,
+    String? phoneNumber,
   }) {
     return AuthState(
       status: status ?? this.status,
       isLoading: isLoading ?? this.isLoading,
       errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
+      fullName: fullName ?? this.fullName,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
     );
   }
 }
@@ -33,7 +44,27 @@ class AuthState {
 class AuthNotifier extends Notifier<AuthState> {
   @override
   AuthState build() {
-    return const AuthState(status: AuthStatus.unauthenticated);
+    _initFromStorage();
+    return const AuthState(status: AuthStatus.unknown);
+  }
+
+  Future<void> _initFromStorage() async {
+    if (!ApiConfig.useLiveBackend) {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+      return;
+    }
+    
+    final hasSession = await AuthService.instance.hasSession();
+    if (hasSession) {
+      final info = await AuthService.instance.getUserInfo();
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        fullName: info['name'],
+        phoneNumber: info['phone'],
+      );
+    } else {
+      state = const AuthState(status: AuthStatus.unauthenticated);
+    }
   }
 
   /// Clear any error messages.
@@ -41,74 +72,77 @@ class AuthNotifier extends Notifier<AuthState> {
     state = state.copyWith(errorMessage: () => null);
   }
 
-  /// Simulate login with error handling.
+  /// Login with real backend or dummy.
   Future<void> login({
     required String phone,
     required String password,
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: () => null);
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Simulate wrong password
-    if (password == 'wrong') {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: () => 'Incorrect password. Please try again.',
-      );
+    
+    if (!ApiConfig.useLiveBackend) {
+      await Future.delayed(const Duration(seconds: 1));
+      if (password == 'wrong') {
+        state = state.copyWith(isLoading: false, errorMessage: () => 'Incorrect password.');
+        return;
+      }
+      state = const AuthState(status: AuthStatus.authenticated);
       return;
     }
 
-    // Simulate account not found
-    if (phone == '000') {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: () => 'No account found with this phone number.',
+    try {
+      final res = await AuthService.instance.login(phoneNumber: phone, password: password);
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        fullName: res['fullName'],
+        phoneNumber: res['phoneNumber'],
       );
-      return;
+    } on ApiException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: () => e.message);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: () => 'Login failed: $e');
     }
-
-    // Simulate network error
-    if (phone == '999') {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: () => 'Network error. Please check your connection.',
-      );
-      return;
-    }
-
-    state = const AuthState(status: AuthStatus.authenticated);
   }
 
-  /// Simulate registration with error handling.
+  /// Register with real backend or dummy.
   Future<void> register({
     required String name,
     required String phone,
     required String password,
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: () => null);
-    await Future.delayed(const Duration(seconds: 1));
-
-    // Simulate phone already registered
-    if (phone == '111') {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: () => 'This phone number is already registered.',
-      );
+    
+    if (!ApiConfig.useLiveBackend) {
+      await Future.delayed(const Duration(seconds: 1));
+      if (phone == '111') {
+        state = state.copyWith(isLoading: false, errorMessage: () => 'Phone already registered.');
+        return;
+      }
+      state = const AuthState(status: AuthStatus.authenticated);
       return;
     }
 
-    state = const AuthState(status: AuthStatus.authenticated);
+    try {
+      final res = await AuthService.instance.register(fullName: name, phoneNumber: phone, password: password);
+      state = AuthState(
+        status: AuthStatus.authenticated,
+        fullName: res['fullName'],
+        phoneNumber: res['phoneNumber'],
+      );
+    } on ApiException catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: () => e.message);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, errorMessage: () => 'Registration failed: $e');
+    }
   }
 
   /// Logout.
-  void logout() {
+  Future<void> logout() async {
+    if (ApiConfig.useLiveBackend) {
+      await AuthService.instance.logout();
+    }
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
 
-  /// Skip auth for development.
-  void skipAuth() {
-    state = const AuthState(status: AuthStatus.authenticated);
-  }
 }
 
 final authProvider = NotifierProvider<AuthNotifier, AuthState>(

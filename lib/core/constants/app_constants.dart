@@ -10,13 +10,6 @@ abstract final class AppConstants {
   static const String appVersion = '1.0.0';
 
   // ──────────────────────────────────────────────
-  //  API / NETWORK (placeholders for Step 2+)
-  // ──────────────────────────────────────────────
-  static const String baseUrl = 'https://api.medicinebank.app/v1';
-  static const Duration connectionTimeout = Duration(seconds: 15);
-  static const Duration receiveTimeout = Duration(seconds: 15);
-
-  // ──────────────────────────────────────────────
   //  FORM VALIDATION
   // ──────────────────────────────────────────────
   static const int phoneNumberMinLength = 10;

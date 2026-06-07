@@ -38,9 +38,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
     ref.read(authProvider.notifier).clearError();
+    final cleanPhone = _phoneController.text.replaceAll(RegExp(r'\s+'), '');
     await ref.read(authProvider.notifier).register(
           name: _nameController.text.trim(),
-          phone: _phoneController.text.trim(),
+          phone: cleanPhone,
           password: _passwordController.text,
         );
   }
@@ -199,8 +200,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       AppSpacing.gapXxl,
 
                       // ── Login Link ──
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Wrap(
+                        alignment: WrapAlignment.center,
                         children: [
                           Text(
                             l.alreadyAccount,

@@ -48,66 +48,68 @@ class MedicineCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              // ── Name + Availability Badge ──
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      medicine.name,
-                      style: AppTypography.titleLarge.copyWith(
-                        color: colors.onSurface,
+                // ── Name + Availability Badge ──
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        medicine.localizedName(context.l10n.locale.languageCode),
+                        style: AppTypography.titleLarge.copyWith(
+                          color: colors.onSurface,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
-                  ),
-                  AppSpacing.gapHSm,
-                  _AvailabilityBadge(isAvailable: medicine.isAvailable),
-                ],
-              ),
-              AppSpacing.gapSm,
-
-              // ── Category Chip ──
-              _CategoryChip(category: medicine.category),
-              AppSpacing.gapLg,
-
-              // ── Description ──
-              Text(
-                medicine.description,
-                style: AppTypography.bodyMedium.copyWith(
-                  color: colors.onSurfaceVariant,
+                    AppSpacing.gapHSm,
+                    _AvailabilityBadge(isAvailable: medicine.isAvailable),
+                  ],
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              AppSpacing.gapLg,
+                AppSpacing.gapSm,
 
-              // ── Metadata Row ──
-              Row(
-                children: [
-                  _MetadataItem(
-                    icon: Icons.inventory_2_outlined,
-                    text: '${context.l10n.qty}: ${medicine.quantityFormatted}',
-                  ),
-                  AppSpacing.gapHXl,
-                  _MetadataItem(
-                    icon: Icons.calendar_today_outlined,
-                    text: '${context.l10n.exp}: ${medicine.expiryFormatted}',
-                  ),
-                ],
-              ),
-              AppSpacing.gapSm,
+                // ── Category Chip ──
+                _CategoryChip(
+                  category: context.l10n.categoryDisplay(medicine.category),
+                ),
+                AppSpacing.gapLg,
 
-              // ── Location ──
-              _MetadataItem(
-                icon: Icons.location_on_outlined,
-                text: '${medicine.location} (${medicine.distanceFormatted})',
-              ),
-            ],
+                // ── Description ──
+                Text(
+                  medicine.description,
+                  style: AppTypography.bodyMedium.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                AppSpacing.gapLg,
+
+                // ── Metadata Row ──
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetadataItem(
+                        icon: Icons.inventory_2_outlined,
+                        text:
+                            '${context.l10n.qty}: ${medicine.quantityFormatted}',
+                      ),
+                    ),
+                    AppSpacing.gapHSm,
+                    Expanded(
+                      child: _MetadataItem(
+                        icon: Icons.calendar_today_outlined,
+                        text: '${context.l10n.exp}: ${medicine.expiryFormatted}',
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
-    ),
-  );
+    );
 
     if (heroTag != null) {
       return Hero(tag: heroTag!, child: card);
@@ -124,23 +126,30 @@ class _AvailabilityBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: isAvailable
-            ? AppColors.success.withValues(alpha: 0.1)
-            : AppColors.disabledLight.withValues(alpha: 0.2),
-        borderRadius: AppShapes.borderRadiusFull,
-      ),
-      child: Text(
-        isAvailable ? context.l10n.available.toUpperCase() : context.l10n.unavailable,
-        style: AppTypography.labelSmall.copyWith(
-          color: isAvailable ? AppColors.success : AppColors.disabledLight,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.5,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 110),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: isAvailable
+              ? AppColors.success.withValues(alpha: 0.1)
+              : AppColors.disabledLight.withValues(alpha: 0.2),
+          borderRadius: AppShapes.borderRadiusFull,
+        ),
+        child: Text(
+          isAvailable
+              ? context.l10n.available.toUpperCase()
+              : context.l10n.unavailable,
+          style: AppTypography.labelSmall.copyWith(
+            color: isAvailable ? AppColors.success : AppColors.disabledLight,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.5,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
@@ -155,21 +164,26 @@ class _CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm + 2,
-        vertical: AppSpacing.xs,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.chipColorForCategory(category),
-        borderRadius: AppShapes.borderRadiusSm,
-      ),
-      child: Text(
-        category.toUpperCase(),
-        style: AppTypography.labelSmall.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.5,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 180),
+      child: Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.sm + 2,
+          vertical: AppSpacing.xs,
+        ),
+        decoration: BoxDecoration(
+          color: AppColors.chipColorForCategory(category),
+          borderRadius: AppShapes.borderRadiusSm,
+        ),
+        child: Text(
+          category.toUpperCase(),
+          style: AppTypography.labelSmall.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
         ),
       ),
     );
@@ -178,10 +192,7 @@ class _CategoryChip extends StatelessWidget {
 
 /// Small icon + text metadata row item.
 class _MetadataItem extends StatelessWidget {
-  const _MetadataItem({
-    required this.icon,
-    required this.text,
-  });
+  const _MetadataItem({required this.icon, required this.text});
 
   final IconData icon;
   final String text;
@@ -194,7 +205,7 @@ class _MetadataItem extends StatelessWidget {
       children: [
         Icon(icon, size: 14, color: color),
         const SizedBox(width: 4),
-        Flexible(
+        Expanded(
           child: Text(
             text,
             style: AppTypography.bodySmall.copyWith(color: color),

@@ -49,10 +49,7 @@ class MedicineBankApp extends ConsumerWidget {
 
       // ── Locale ──
       locale: settings.locale,
-      supportedLocales: const [
-        Locale('en'),
-        Locale('ar'),
-      ],
+      supportedLocales: const [Locale('en'), Locale('ar')],
       localizationsDelegates: const [
         AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,

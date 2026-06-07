@@ -20,8 +20,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 class _LoginScreenState extends ConsumerState<LoginScreen>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  final _phoneCtrl = TextEditingController();
-  final _passwordCtrl = TextEditingController();
+  final _phoneCtrl = TextEditingController(text: '01000000000');
+  final _passwordCtrl = TextEditingController(text: '123456');
 
   late final AnimationController _shakeCtrl;
   late final Animation<double> _shakeAnim;
@@ -29,10 +29,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   @override
   void initState() {
     super.initState();
-    _shakeCtrl = AnimationController(vsync: this, duration: const Duration(milliseconds: 500));
-    _shakeAnim = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _shakeCtrl, curve: Curves.elasticIn),
+    _shakeCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
     );
+    _shakeAnim = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _shakeCtrl, curve: Curves.elasticIn));
   }
 
   @override
@@ -46,9 +50,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
     ref.read(authProvider.notifier).clearError();
-    await ref.read(authProvider.notifier).login(
-      phone: _phoneCtrl.text.trim(), password: _passwordCtrl.text,
-    );
+    final cleanPhone = _phoneCtrl.text.replaceAll(RegExp(r'\s+'), '');
+    await ref
+        .read(authProvider.notifier)
+        .login(phone: cleanPhone, password: _passwordCtrl.text);
     if (ref.read(authProvider).hasError) {
       _shakeCtrl.forward(from: 0);
     }
@@ -65,7 +70,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     return Scaffold(
       body: Container(
         decoration: BoxDecoration(
-          gradient: isDark ? AppColors.darkBackgroundGradient : AppColors.backgroundGradient,
+          gradient: isDark
+              ? AppColors.darkBackgroundGradient
+              : AppColors.backgroundGradient,
         ),
         child: SafeArea(
           child: Center(
@@ -74,88 +81,169 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               child: AnimatedBuilder(
                 animation: _shakeAnim,
                 builder: (context, child) {
-                  final dx = _shakeAnim.value * 8 *
+                  final dx =
+                      _shakeAnim.value *
+                      8 *
                       ((_shakeCtrl.value * 8).toInt().isEven ? 1 : -1);
-                  return Transform.translate(offset: Offset(dx, 0), child: child);
+                  return Transform.translate(
+                    offset: Offset(dx, 0),
+                    child: child,
+                  );
                 },
                 child: Container(
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
                     color: isDark ? AppColors.cardDark : AppColors.cardLight,
                     borderRadius: AppShapes.borderRadiusXl,
-                    boxShadow: isDark ? AppShadows.cardDark : AppShadows.cardLight,
+                    boxShadow: isDark
+                        ? AppShadows.cardDark
+                        : AppShadows.cardLight,
                   ),
                   child: Form(
                     key: _formKey,
-                    child: Column(mainAxisSize: MainAxisSize.min, children: [
-                      // ── Header with logo ──
-                      AuthHeader(title: l.profileLogin,
-                          subtitle: l.loginSubtitle),
-                      AppSpacing.gapXxxl,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // ── Header with logo ──
+                        AuthHeader(
+                          title: l.profileLogin,
+                          subtitle: l.loginSubtitle,
+                        ),
+                        AppSpacing.gapXxxl,
 
-                      // Error message
-                      if (authState.hasError) ...[
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: AppColors.error.withValues(alpha: 0.08),
-                            borderRadius: AppShapes.borderRadiusMd,
-                            border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+                        // Error message
+                        if (authState.hasError) ...[
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: AppColors.error.withValues(alpha: 0.08),
+                              borderRadius: AppShapes.borderRadiusMd,
+                              border: Border.all(
+                                color: AppColors.error.withValues(alpha: 0.3),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  color: AppColors.error,
+                                  size: 18,
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    authState.errorMessage!,
+                                    style: AppTypography.bodySmall.copyWith(
+                                      color: AppColors.error,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          child: Row(children: [
-                            const Icon(Icons.error_outline, color: AppColors.error, size: 18),
-                            const SizedBox(width: 8),
-                            Expanded(child: Text(authState.errorMessage!,
-                                style: AppTypography.bodySmall.copyWith(color: AppColors.error))),
-                          ]),
-                        ),
-                        AppSpacing.gapLg,
-                      ],
+                          AppSpacing.gapLg,
+                        ],
 
-                      // Phone
-                      AppTextField(controller: _phoneCtrl, label: l.phoneNumber,
-                          hint: '100 123 4567', keyboardType: TextInputType.phone,
+                        // Phone
+                        AppTextField(
+                          controller: _phoneCtrl,
+                          label: l.phoneNumber,
+                          hint: '100 123 4567',
+                          keyboardType: TextInputType.phone,
                           textInputAction: TextInputAction.next,
-                          prefix: Padding(padding: const EdgeInsetsDirectional.only(end: 8),
-                              child: Text('+2', style: AppTypography.bodyLarge.copyWith(color: colors.onSurface))),
-                          validator: (v) => v == null || v.trim().isEmpty ? l.phoneRequired : null),
-                      AppSpacing.gapXl,
-
-                      // Password
-                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                          Text(l.password, style: AppTypography.titleSmall.copyWith(color: colors.onSurface)),
-                          GestureDetector(
-                              onTap: () => context.pushNamed(RouteNames.forgotPassword),
-                              child: Text(l.forgotPassword,
-                                  style: AppTypography.titleSmall.copyWith(color: colors.primary))),
-                        ]),
-                        AppSpacing.gapSm,
-                        Directionality(
-                          textDirection: TextDirection.ltr,
-                          child: TextFormField(controller: _passwordCtrl, obscureText: true,
-                              textInputAction: TextInputAction.done,
-                              textDirection: TextDirection.ltr,
-                              textAlign: TextAlign.left,
-                              onFieldSubmitted: (_) => _handleLogin(),
-                              style: AppTypography.bodyLarge.copyWith(color: colors.onSurface),
-                              decoration: const InputDecoration(hintText: '••••••••', hintTextDirection: TextDirection.ltr),
-                              validator: (v) => v == null || v.isEmpty ? l.passwordRequired : null),
+                          prefix: Padding(
+                            padding: const EdgeInsetsDirectional.only(end: 8),
+                            child: Text(
+                              '+2',
+                              style: AppTypography.bodyLarge.copyWith(
+                                color: colors.onSurface,
+                              ),
+                            ),
+                          ),
+                          validator: (v) => v == null || v.trim().isEmpty
+                              ? l.phoneRequired
+                              : null,
                         ),
-                      ]),
-                      AppSpacing.gapXxxl,
-                      AppButton(label: l.logIn, onPressed: _handleLogin, isLoading: authState.isLoading),
-                      AppSpacing.gapXxl,
-                      Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text(l.noAccount,
-                            style: AppTypography.bodyMedium.copyWith(color: colors.onSurfaceVariant)),
-                        GestureDetector(
-                            onTap: () => context.pushNamed(RouteNames.signUp),
-                            child: Text(l.signUp,
-                                style: AppTypography.titleSmall.copyWith(color: colors.primary))),
-                      ]),
-                    ]),
+                        AppSpacing.gapXl,
+
+                        // Password
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    l.password,
+                                    style: AppTypography.titleSmall.copyWith(
+                                      color: colors.onSurface,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                Flexible(
+                                  child: GestureDetector(
+                                    onTap: () => context.pushNamed(
+                                      RouteNames.forgotPassword,
+                                    ),
+                                    child: Text(
+                                      l.forgotPassword,
+                                      style: AppTypography.titleSmall.copyWith(
+                                        color: colors.primary,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            AppSpacing.gapSm,
+                            AppTextField(
+                              controller: _passwordCtrl,
+                              hint: '••••••••',
+                              obscureText: true,
+                              showObscureToggle: true,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (_) => _handleLogin(),
+                              validator: (v) => v == null || v.isEmpty
+                                  ? l.passwordRequired
+                                  : null,
+                            ),
+                          ],
+                        ),
+                        AppSpacing.gapXxxl,
+                        AppButton(
+                          label: l.logIn,
+                          onPressed: _handleLogin,
+                          isLoading: authState.isLoading,
+                        ),
+                        AppSpacing.gapXxl,
+                        Wrap(
+                          alignment: WrapAlignment.center,
+                          children: [
+                            Text(
+                              l.noAccount,
+                              style: AppTypography.bodyMedium.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () => context.pushNamed(RouteNames.signUp),
+                              child: Text(
+                                l.signUp,
+                                style: AppTypography.titleSmall.copyWith(
+                                  color: colors.primary,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -165,14 +253,4 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       ),
     );
   }
-}
-
-/// Simplified animated builder.
-class AnimatedBuilder extends AnimatedWidget {
-  const AnimatedBuilder({super.key, required Animation<double> animation,
-    required this.builder, this.child}) : super(listenable: animation);
-  final Widget Function(BuildContext, Widget?) builder;
-  final Widget? child;
-  @override
-  Widget build(BuildContext context) => builder(context, child);
 }

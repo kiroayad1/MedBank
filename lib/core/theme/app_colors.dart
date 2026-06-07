@@ -97,6 +97,12 @@ abstract final class AppColors {
     colors: [primarySurface, Color(0xFFF5F8FA)],
   );
 
+  static const LinearGradient darkHeroGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFF1C2735), Color(0xFF141B27)],
+  );
+
   static const LinearGradient darkBackgroundGradient = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,

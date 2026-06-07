@@ -46,3 +46,15 @@ app.*.map.json
 
 # Temporary Backend
 TEST BACKEND/
+
+# IDE / Editor configs
+.vscode/
+.idea/
+.cursor/
+.claude/
+.agents/
+
+# Source images not meant for version control
+/WhatsApp Image*.jpeg
+/WhatsApp Image*.jpg
+/WhatsApp Image*.png

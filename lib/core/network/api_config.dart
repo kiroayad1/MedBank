@@ -5,7 +5,6 @@ class ApiConfig {
   ApiConfig._();
 
   /// Master toggle: `true` = hit real backend, `false` = use dummy data.
-  /// Priority: --dart-define > standalone default
   static const bool useLiveBackend = bool.fromEnvironment(
     'USE_LIVE_BACKEND',
     defaultValue: false,

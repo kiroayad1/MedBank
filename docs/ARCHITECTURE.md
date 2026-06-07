@@ -342,4 +342,20 @@ test('userProvider loads user successfully', () async {
 
 ---
 
-*For backend integration specifics, see [INTEGRATION.md](INTEGRATION.md). For model mappings, see [MODELS.md](MODELS.md).*
+## Related Documentation
+
+| Document | Purpose |
+|---|---|
+| [GUIDE.md](GUIDE.md) | Master index for all documentation |
+| [SETUP.md](SETUP.md) | Environment setup |
+| [FRONTEND.md](FRONTEND.md) | Deep dive into every feature module |
+| [BACKEND.md](BACKEND.md) | Stack-agnostic backend specification |
+| [INTEGRATION.md](INTEGRATION.md) | Connection matrix and auth flow |
+| [API_CONTRACT.md](API_CONTRACT.md) | Endpoint notes and special cases |
+| [MODELS.md](MODELS.md) | Dart model field mappings |
+| [DEPLOYMENT.md](DEPLOYMENT.md) | Build commands and release checklist |
+| [TESTING.md](TESTING.md) | Unit, widget, and integration testing |
+
+---
+
+*Last updated: June 2026*

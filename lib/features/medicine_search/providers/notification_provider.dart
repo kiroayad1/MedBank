@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/network/api_config.dart';
-import '../../../core/network/services/notification_service.dart';
 import '../models/notification_model.dart';
+import '../repositories/notification_repository_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class NotificationState {
@@ -46,22 +45,11 @@ class NotificationNotifier extends Notifier<NotificationState> {
   Future<void> loadData() async {
     state = state.copyWith(isLoading: true, errorMessage: () => null);
 
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      state = state.copyWith(
-        notifications: NotificationDummyData.notifications,
-        unreadCount: NotificationDummyData.notifications.where((n) => !n.isRead).length,
-        isLoading: false,
-      );
-      return;
-    }
-
     try {
-      final res = await NotificationService.instance.getAll();
-      final count = await NotificationService.instance.getUnreadCount();
-      
-      final data = res.map((json) => NotificationModel.fromJson(json)).toList();
-      
+      final repo = ref.read(notificationRepositoryProvider);
+      final data = await repo.getAll();
+      final count = await repo.getUnreadCount();
+
       state = state.copyWith(
         notifications: data,
         unreadCount: count,
@@ -76,10 +64,9 @@ class NotificationNotifier extends Notifier<NotificationState> {
   }
 
   Future<void> markAllRead() async {
-    if (!ApiConfig.useLiveBackend) return;
-    
     try {
-      await NotificationService.instance.markAllRead();
+      final repo = ref.read(notificationRepositoryProvider);
+      await repo.markAllRead();
       final current = state.notifications.map((n) {
         return NotificationModel(
           id: n.id,
@@ -94,12 +81,13 @@ class NotificationNotifier extends Notifier<NotificationState> {
           medicineName: n.medicineName,
         );
       }).toList();
-      
+
       state = state.copyWith(notifications: current, unreadCount: 0);
     } catch (_) {}
   }
 }
 
-final notificationProvider = NotifierProvider<NotificationNotifier, NotificationState>(
-  NotificationNotifier.new,
-);
+final notificationProvider =
+    NotifierProvider<NotificationNotifier, NotificationState>(
+      NotificationNotifier.new,
+    );

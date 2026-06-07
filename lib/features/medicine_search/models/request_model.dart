@@ -40,23 +40,3 @@ class RequestModel {
     return medicineName;
   }
 }
-
-/// Offline mock data for requests
-abstract final class RequestDummyData {
-  static final List<RequestModel> requests = [
-    RequestModel(
-      id: 1,
-      medicineName: 'Insulin Glargine',
-      quantity: 3,
-      status: 'Pending',
-      requestDate: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    RequestModel(
-      id: 2,
-      medicineName: 'Lisinopril',
-      quantity: 1,
-      status: 'Fulfilled',
-      requestDate: DateTime.now().subtract(const Duration(days: 10)),
-    ),
-  ];
-}

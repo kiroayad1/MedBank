@@ -2,171 +2,61 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/l10n/app_localizations.dart';
-import '../../../core/network/api_config.dart';
-import '../../../core/network/services/medicine_service.dart';
-import '../../../core/router/route_names.dart';
-import '../../../core/theme/theme.dart';
-import '../../../shared/widgets/app_button.dart';
-import '../models/medicine_model.dart';
+import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/router/route_names.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../shared/widgets/app_button.dart';
+import '../providers/category_medicines_provider.dart';
 
 /// Screen displaying a list of medicines filtered by a specific category.
-class CategoryMedicinesScreen extends ConsumerStatefulWidget {
+class CategoryMedicinesScreen extends ConsumerWidget {
   const CategoryMedicinesScreen({super.key, required this.category});
 
   final String category;
 
   @override
-  ConsumerState<CategoryMedicinesScreen> createState() =>
-      _CategoryMedicinesScreenState();
-}
-
-class _CategoryMedicinesScreenState
-    extends ConsumerState<CategoryMedicinesScreen> {
-  final _searchController = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMedicines();
-  }
-
-  List<Medicine> _medicines = [];
-  bool _isLoading = true;
-  String? _error;
-
-  Future<void> _loadMedicines() async {
-    setState(() {
-      _isLoading = true;
-      _error = null;
-    });
-
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      final all = MedicineDummyData.medicines
-          .where((m) => m.category == widget.category)
-          .toList();
-      setState(() {
-        _medicines = all;
-        _isLoading = false;
-      });
-      return;
-    }
-
-    try {
-      final res = await MedicineService.instance.getByCategory(widget.category);
-      final data = res.map((json) => Medicine.fromJson(json)).toList();
-      setState(() {
-        _medicines = data;
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to load medicines: $e';
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final isDark = theme.brightness == Brightness.dark;
     final l = context.l10n;
 
-    var medicines = _medicines;
-    final query = _searchController.text.trim().toLowerCase();
-    if (query.isNotEmpty) {
-      medicines = medicines.where((m) {
-        return m.name.toLowerCase().contains(query) ||
-            m.description.toLowerCase().contains(query);
-      }).toList();
-    }
+    final medicinesAsync = ref.watch(categoryMedicinesProvider(category));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          l.categoryDisplay(widget.category),
+          l.categoryDisplay(category),
           style: AppTypography.headlineSmall.copyWith(color: colors.onSurface),
         ),
       ),
-      body: Column(
-        children: [
-          // ── Search Bar ──
-          Padding(
-            padding: AppSpacing.screenPaddingAll,
-            child: Container(
-              decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : const Color(0xFFF5F5F7),
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(
-                  color: isDark
-                      ? AppColors.dividerDark
-                      : const Color(0xFFE8E8EC),
-                ),
-              ),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: '${l.searchForMedicine} ${l.categoryDisplay(widget.category)}...',
-                  hintStyle: AppTypography.bodyLarge.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
-                  prefixIcon: Icon(
-                    Icons.search_rounded,
-                    color: colors.onSurfaceVariant,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 15,
-                  ),
-                ),
-                style: AppTypography.bodyLarge.copyWith(
-                  color: colors.onSurface,
-                ),
-              ),
-            ),
-          ),
-
-          // ── Medicine List ──
-          Expanded(
-            child: _isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : _error != null
-                ? Center(child: Text(_error!))
-                : medicines.isEmpty
-                ? Center(child: Text(l.noMedicinesFound))
-                : ListView.separated(
-                    padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
-                    itemCount: medicines.length,
-                    separatorBuilder: (context, index) =>
-                        const SizedBox(height: 16),
-                    itemBuilder: (context, index) {
-                      final med = medicines[index];
-                      return _CategoryMedicineCard(
-                        name: med.localizedName(l.locale.languageCode),
-                        qty: med.quantity,
-                        unit: med.unit,
-                        condition: med.condition,
-                        onRequestTap: () {
-                          context.pushNamed(
-                            RouteNames.medicineDetails,
-                            pathParameters: {'id': med.id},
-                          );
-                        },
-                      );
-                    },
-                  ),
-          ),
-        ],
+      body: medicinesAsync.when(
+        data: (medicines) {
+          if (medicines.isEmpty) {
+            return Center(child: Text(l.noMedicinesFound));
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 32),
+            itemCount: medicines.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final med = medicines[index];
+              return _CategoryMedicineCard(
+                name: med.localizedName(l.locale.languageCode),
+                qty: med.quantity,
+                unit: med.unit,
+                condition: med.condition,
+                onRequestTap: () {
+                  context.pushNamed(
+                    RouteNames.medicineDetails,
+                    pathParameters: {'id': med.id},
+                  );
+                },
+              );
+            },
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, _) => Center(child: Text('Failed to load: $error')),
       ),
     );
   }

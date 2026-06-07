@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/network/api_config.dart';
-import '../../../core/network/services/request_service.dart';
 import '../models/request_model.dart';
+import '../repositories/request_repository_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class RequestState {
@@ -42,15 +41,9 @@ class RequestNotifier extends Notifier<RequestState> {
   Future<void> loadHistory() async {
     state = state.copyWith(isLoading: true, errorMessage: () => null);
 
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      state = state.copyWith(requests: RequestDummyData.requests, isLoading: false);
-      return;
-    }
-
     try {
-      final res = await RequestService.instance.getHistory();
-      final data = res.map((json) => RequestModel.fromJson(json)).toList();
+      final repo = ref.read(requestRepositoryProvider);
+      final data = await repo.getHistory();
       state = state.copyWith(requests: data, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -61,13 +54,9 @@ class RequestNotifier extends Notifier<RequestState> {
   }
 
   Future<void> checkout(List<Map<String, int>> items) async {
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(seconds: 1));
-      return;
-    }
+    final repo = ref.read(requestRepositoryProvider);
+    await repo.checkout(items);
 
-    await RequestService.instance.checkout(items);
-    
     // Refresh list
     loadHistory();
   }

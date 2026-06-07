@@ -11,8 +11,9 @@ import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/profile_screen.dart';
 import '../../features/auth/screens/settings_screen.dart';
 import '../../features/auth/screens/sign_up_screen.dart';
-import '../../features/medicine_search/models/medicine_model.dart';
 import '../../features/medicine_details/screens/medicine_details_screen.dart';
+import '../../features/medicine_search/models/medicine_model.dart';
+import '../../features/medicine_search/providers/medicine_details_provider.dart';
 import '../../features/medicine_details/screens/order_confirmation_screen.dart';
 import '../../features/medicine_search/screens/browse_screen.dart';
 import '../../features/medicine_search/screens/category_medicines_screen.dart';
@@ -159,13 +160,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: RouteNames.orderConfirmation,
         builder: (_, state) {
           final extra = state.extra;
-          final med = extra is Medicine
-              ? extra
-              : MedicineDummyData.medicines.firstWhere(
-                  (m) => m.id == (state.pathParameters['id'] ?? '1'),
-                  orElse: () => MedicineDummyData.medicines.first,
-                );
-          return OrderConfirmationScreen(medicine: med);
+          if (extra is Medicine) {
+            return OrderConfirmationScreen(medicine: extra);
+          }
+          final id = state.pathParameters['id'] ?? '1';
+          return Consumer(
+            builder: (context, ref, child) {
+              final asyncMed = ref.watch(medicineDetailsProvider(id));
+              return asyncMed.when(
+                data: (med) => OrderConfirmationScreen(medicine: med),
+                loading: () => const Scaffold(
+                  body: Center(child: CircularProgressIndicator()),
+                ),
+                error: (err, _) =>
+                    Scaffold(body: Center(child: Text('Error: $err'))),
+              );
+            },
+          );
         },
       ),
 

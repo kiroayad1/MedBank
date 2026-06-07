@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/api_config.dart';
+
 import '../../../core/network/api_exception.dart';
-import '../../../core/network/services/auth_service.dart';
+import '../repositories/auth_repository_provider.dart';
 
 /// Authentication state.
 enum AuthStatus { unknown, unauthenticated, authenticated }
@@ -49,14 +49,10 @@ class AuthNotifier extends Notifier<AuthState> {
   }
 
   Future<void> _initFromStorage() async {
-    if (!ApiConfig.useLiveBackend) {
-      state = const AuthState(status: AuthStatus.unauthenticated);
-      return;
-    }
-    
-    final hasSession = await AuthService.instance.hasSession();
+    final repo = ref.read(authRepositoryProvider);
+    final hasSession = await repo.hasSession();
     if (hasSession) {
-      final info = await AuthService.instance.getUserInfo();
+      final info = await repo.getUserInfo();
       state = AuthState(
         status: AuthStatus.authenticated,
         fullName: info['name'],
@@ -72,25 +68,13 @@ class AuthNotifier extends Notifier<AuthState> {
     state = state.copyWith(errorMessage: () => null);
   }
 
-  /// Login with real backend or dummy.
-  Future<void> login({
-    required String phone,
-    required String password,
-  }) async {
+  /// Login with phone and password.
+  Future<void> login({required String phone, required String password}) async {
     state = state.copyWith(isLoading: true, errorMessage: () => null);
-    
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(seconds: 1));
-      if (password == 'wrong') {
-        state = state.copyWith(isLoading: false, errorMessage: () => 'Incorrect password.');
-        return;
-      }
-      state = const AuthState(status: AuthStatus.authenticated);
-      return;
-    }
 
     try {
-      final res = await AuthService.instance.login(phoneNumber: phone, password: password);
+      final repo = ref.read(authRepositoryProvider);
+      final res = await repo.login(phone: phone, password: password);
       state = AuthState(
         status: AuthStatus.authenticated,
         fullName: res['fullName'],
@@ -99,30 +83,28 @@ class AuthNotifier extends Notifier<AuthState> {
     } on ApiException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: () => e.message);
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: () => 'Login failed: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: () => 'Login failed: $e',
+      );
     }
   }
 
-  /// Register with real backend or dummy.
+  /// Register a new user.
   Future<void> register({
     required String name,
     required String phone,
     required String password,
   }) async {
     state = state.copyWith(isLoading: true, errorMessage: () => null);
-    
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(seconds: 1));
-      if (phone == '111') {
-        state = state.copyWith(isLoading: false, errorMessage: () => 'Phone already registered.');
-        return;
-      }
-      state = const AuthState(status: AuthStatus.authenticated);
-      return;
-    }
 
     try {
-      final res = await AuthService.instance.register(fullName: name, phoneNumber: phone, password: password);
+      final repo = ref.read(authRepositoryProvider);
+      final res = await repo.register(
+        name: name,
+        phone: phone,
+        password: password,
+      );
       state = AuthState(
         status: AuthStatus.authenticated,
         fullName: res['fullName'],
@@ -131,18 +113,19 @@ class AuthNotifier extends Notifier<AuthState> {
     } on ApiException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: () => e.message);
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: () => 'Registration failed: $e');
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: () => 'Registration failed: $e',
+      );
     }
   }
 
   /// Logout.
   Future<void> logout() async {
-    if (ApiConfig.useLiveBackend) {
-      await AuthService.instance.logout();
-    }
+    final repo = ref.read(authRepositoryProvider);
+    await repo.logout();
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
-
 }
 
 final authProvider = NotifierProvider<AuthNotifier, AuthState>(

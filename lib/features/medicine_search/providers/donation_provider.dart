@@ -1,8 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/network/api_config.dart';
-import '../../../core/network/services/donation_service.dart';
 import '../models/donation_model.dart';
+import '../repositories/donation_repository_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class DonationState {
@@ -42,15 +41,9 @@ class DonationNotifier extends Notifier<DonationState> {
   Future<void> loadMyDonations() async {
     state = state.copyWith(isLoading: true, errorMessage: () => null);
 
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      state = state.copyWith(donations: DonationDummyData.donations, isLoading: false);
-      return;
-    }
-
     try {
-      final res = await DonationService.instance.getMyDonations();
-      final data = res.map((json) => DonationModel.fromJson(json)).toList();
+      final repo = ref.read(donationRepositoryProvider);
+      final data = await repo.getMyDonations();
       state = state.copyWith(donations: data, isLoading: false);
     } catch (e) {
       state = state.copyWith(
@@ -71,12 +64,8 @@ class DonationNotifier extends Notifier<DonationState> {
     String? manufacturer,
     String? deliveryMethod,
   }) async {
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(seconds: 1));
-      return;
-    }
-
-    await DonationService.instance.create(
+    final repo = ref.read(donationRepositoryProvider);
+    await repo.createDonation(
       medicineName: medicineName,
       expiryDate: expiryDate,
       quantity: quantity,
@@ -87,7 +76,7 @@ class DonationNotifier extends Notifier<DonationState> {
       manufacturer: manufacturer,
       deliveryMethod: deliveryMethod,
     );
-    
+
     // Refresh list
     loadMyDonations();
   }

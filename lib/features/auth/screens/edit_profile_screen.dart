@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/l10n/app_localizations.dart';
+import '../../../../core/l10n/app_localizations.dart';
 
-import '../../../core/theme/theme.dart';
-import '../../../shared/widgets/app_button.dart';
-import '../../../shared/widgets/app_text_field.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../shared/widgets/app_button.dart';
+import '../../../../shared/widgets/app_text_field.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/providers/auth_provider.dart';
-import '../../../core/network/api_config.dart';
-import '../../../core/network/services/auth_service.dart';
+import '../../auth/repositories/auth_repository_provider.dart';
 
 /// Edit Profile screen matching Stitch design.
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -48,17 +47,14 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
-    
+
     try {
-      if (ApiConfig.useLiveBackend) {
-        await AuthService.instance.updateProfile(
-          fullName: _nameCtrl.text.trim(),
-          phoneNumber: _phoneCtrl.text.trim(),
-        );
-      } else {
-        await Future.delayed(const Duration(seconds: 1));
-      }
-      
+      final repo = ref.read(authRepositoryProvider);
+      await repo.updateProfile(
+        fullName: _nameCtrl.text.trim(),
+        phoneNumber: _phoneCtrl.text.trim(),
+      );
+
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -115,13 +111,17 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     child: Builder(
                       builder: (context) {
                         final name = _nameCtrl.text.trim();
-                        final parts = name.split(' ').where((p) => p.isNotEmpty).toList();
+                        final parts = name
+                            .split(' ')
+                            .where((p) => p.isNotEmpty)
+                            .toList();
                         String initials = 'U';
                         if (parts.isNotEmpty) {
                           if (parts.length == 1) {
                             initials = parts[0][0].toUpperCase();
                           } else {
-                            initials = '${parts[0][0]}${parts.last[0]}'.toUpperCase();
+                            initials = '${parts[0][0]}${parts.last[0]}'
+                                .toUpperCase();
                           }
                         }
                         return Text(
@@ -131,7 +131,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             fontWeight: FontWeight.w700,
                           ),
                         );
-                      }
+                      },
                     ),
                   ),
                 ),

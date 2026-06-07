@@ -2,98 +2,61 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/l10n/app_localizations.dart';
-import '../../../core/network/api_config.dart';
-import '../../../core/network/services/medicine_service.dart';
-import '../../../core/router/route_names.dart';
-import '../../../core/theme/theme.dart';
-import '../../../shared/widgets/app_button.dart';
+import '../../../../core/l10n/app_localizations.dart';
+import '../../../../core/router/route_names.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../../shared/widgets/app_button.dart';
 import '../../medicine_search/models/medicine_model.dart';
+import '../../medicine_search/providers/medicine_details_provider.dart';
 
 /// Medicine Details screen with Hero animation support.
 ///
 /// Shows full details for a medicine: name, category, description,
 /// quantity, expiry, location, condition, manufacturer.
-class MedicineDetailsScreen extends ConsumerStatefulWidget {
+class MedicineDetailsScreen extends ConsumerWidget {
   const MedicineDetailsScreen({super.key, required this.medicineId});
 
   final String medicineId;
 
   @override
-  ConsumerState<MedicineDetailsScreen> createState() =>
-      _MedicineDetailsScreenState();
-}
-
-class _MedicineDetailsScreenState extends ConsumerState<MedicineDetailsScreen> {
-  Medicine? _medicine;
-  bool _isLoading = true;
-  String? _error;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadMedicine();
-  }
-
-  Future<void> _loadMedicine() async {
-    if (!ApiConfig.useLiveBackend) {
-      final found = MedicineDummyData.medicines.firstWhere(
-        (m) => m.id == widget.medicineId,
-        orElse: () => MedicineDummyData.medicines.first,
-      );
-      setState(() {
-        _medicine = found;
-        _isLoading = false;
-      });
-      return;
-    }
-
-    try {
-      final res = await MedicineService.instance.getById(
-        int.parse(widget.medicineId),
-      );
-      setState(() {
-        _medicine = Medicine.fromJson(res);
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Failed to load medicine: $e';
-        _isLoading = false;
-      });
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
     final l = context.l10n;
 
-    if (_isLoading) {
-      return Scaffold(
+    final medicineAsync = ref.watch(medicineDetailsProvider(medicineId));
+
+    return medicineAsync.when(
+      data: (medicine) => _buildContent(context, medicine, colors, isDark),
+      loading: () => Scaffold(
         appBar: AppBar(
           title: Text(l.appName, style: theme.appBarTheme.titleTextStyle),
         ),
         body: const Center(child: CircularProgressIndicator()),
-      );
-    }
-
-    if (_error != null || _medicine == null) {
-      return Scaffold(
+      ),
+      error: (error, _) => Scaffold(
         appBar: AppBar(
           title: Text(l.appName, style: theme.appBarTheme.titleTextStyle),
         ),
-        body: Center(child: Text(_error ?? 'Medicine not found')),
-      );
-    }
+        body: Center(child: Text('Failed to load: $error')),
+      ),
+    );
+  }
 
-    final medicine = _medicine!;
-
+  Widget _buildContent(
+    BuildContext context,
+    Medicine medicine,
+    ColorScheme colors,
+    bool isDark,
+  ) {
+    final l = context.l10n;
     return Scaffold(
       appBar: AppBar(
-        title: Text(l.appName, style: theme.appBarTheme.titleTextStyle),
+        title: Text(
+          l.appName,
+          style: Theme.of(context).appBarTheme.titleTextStyle,
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -108,7 +71,9 @@ class _MedicineDetailsScreenState extends ConsumerState<MedicineDetailsScreen> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    gradient: isDark ? AppColors.darkHeroGradient : AppColors.heroGradient,
+                    gradient: isDark
+                        ? AppColors.darkHeroGradient
+                        : AppColors.heroGradient,
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +94,9 @@ class _MedicineDetailsScreenState extends ConsumerState<MedicineDetailsScreen> {
                         ],
                       ),
                       AppSpacing.gapSm,
-                      _CategoryChip(category: l.categoryDisplay(medicine.category)),
+                      _CategoryChip(
+                        category: l.categoryDisplay(medicine.category),
+                      ),
                     ],
                   ),
                 ),

@@ -43,25 +43,3 @@ class DonationModel {
     return medicineName;
   }
 }
-
-/// Offline mock data for donations
-abstract final class DonationDummyData {
-  static final List<DonationModel> donations = [
-    DonationModel(
-      id: 1,
-      medicineId: 101,
-      medicineName: 'Panadol Extra',
-      quantity: 2,
-      status: 'Pending',
-      donationDate: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    DonationModel(
-      id: 2,
-      medicineId: 102,
-      medicineName: 'Amoxicillin',
-      quantity: 1,
-      status: 'Approved',
-      donationDate: DateTime.now().subtract(const Duration(days: 5)),
-    ),
-  ];
-}

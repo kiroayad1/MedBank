@@ -32,15 +32,20 @@ If you are testing locally on an Android Emulator, use `http://10.0.2.2:PORT/api
 
 ## Documentation
 
-Comprehensive documentation for backend integration is available in the `docs/` folder:
+Comprehensive documentation is available in the `docs/` folder. **Start at [docs/GUIDE.md](docs/GUIDE.md).**
 
-- [Architecture Guide](docs/ARCHITECTURE.md) — Layered architecture, data flow, and feature workflow for the Flutter app.
-- [Integration Guide](docs/INTEGRATION.md) — The main handoff document explaining architecture and connections.
-- [API Contract](docs/API_CONTRACT.md) — Endpoint notes and expectations.
-- [OpenAPI Spec](docs/api/openapi.json) — The full OpenAPI 3.0 specification exported from the initial mockup backend.
+Key documents:
+
+- [Architecture Guide](docs/ARCHITECTURE.md) — Layered architecture, Repository Pattern, Riverpod, data flow.
+- [Frontend Deep Dive](docs/FRONTEND.md) — Every feature module explained. How to add new features. How to remove mocks.
+- [Backend Specification](docs/BACKEND.md) — **Stack-agnostic API spec** with full SQL schema, endpoints, and integration checklist.
+- [Integration Guide](docs/INTEGRATION.md) — Connection matrix (Screen → Provider → Repository → Service → Endpoint).
+- [API Contract](docs/API_CONTRACT.md) — Endpoint notes, PascalCase routes, special cases.
 - [Models Mapping](docs/MODELS.md) — How Dart models map to JSON.
-- [Backend Checklist](docs/BACKEND_CHECKLIST.md) — Actionable items for the backend team.
-- [Network Layer Overview](lib/core/network/README.md) — Developer-focused guide on how `ApiClient` and providers are wired.
+- [Setup Guide](docs/SETUP.md) — Install Flutter, IDE, emulator, and backend server.
+- [Deployment Guide](docs/DEPLOYMENT.md) — Build commands, `dart-define` flags, release checklist.
+- [Testing Guide](docs/TESTING.md) — Unit, widget, and integration testing.
+- [OpenAPI Spec](docs/api/openapi.json) — Full OpenAPI 3.0 specification.
 
 ## Folder Structure
 

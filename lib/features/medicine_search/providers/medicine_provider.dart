@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/network/api_config.dart';
-import '../../../core/network/services/medicine_service.dart';
 import '../models/medicine_model.dart';
+import '../repositories/medicine_repository_provider.dart';
 
 /// State for the browse/search screen.
 class MedicineSearchState {
@@ -40,9 +39,7 @@ class MedicineSearchState {
       selectedCategory: selectedCategory != null
           ? selectedCategory()
           : this.selectedCategory,
-      errorMessage: errorMessage != null
-          ? errorMessage()
-          : this.errorMessage,
+      errorMessage: errorMessage != null ? errorMessage() : this.errorMessage,
     );
   }
 }
@@ -60,22 +57,11 @@ class MedicineSearchNotifier extends Notifier<MedicineSearchState> {
 
   Future<void> _loadMedicines() async {
     state = state.copyWith(isLoading: true, errorMessage: () => null);
-    
-    if (!ApiConfig.useLiveBackend) {
-      await Future.delayed(const Duration(milliseconds: 800));
-      final data = MedicineDummyData.medicines;
-      state = state.copyWith(
-        medicines: data,
-        filteredMedicines: data,
-        isLoading: false,
-      );
-      return;
-    }
 
     try {
-      final res = await MedicineService.instance.getAll();
-      final List<Medicine> data = res.map((json) => Medicine.fromJson(json)).toList();
-      
+      final repo = ref.read(medicineRepositoryProvider);
+      final data = await repo.getMedicines();
+
       state = state.copyWith(
         medicines: data,
         filteredMedicines: data,
@@ -101,9 +87,7 @@ class MedicineSearchNotifier extends Notifier<MedicineSearchState> {
 
   /// Filter by category.
   void selectCategory(String? category) {
-    state = state.copyWith(
-      selectedCategory: () => category,
-    );
+    state = state.copyWith(selectedCategory: () => category);
     _applyFilters();
   }
 
@@ -149,5 +133,5 @@ class MedicineSearchNotifier extends Notifier<MedicineSearchState> {
 
 final medicineSearchProvider =
     NotifierProvider<MedicineSearchNotifier, MedicineSearchState>(
-  MedicineSearchNotifier.new,
-);
+      MedicineSearchNotifier.new,
+    );

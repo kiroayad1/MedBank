@@ -76,6 +76,8 @@ sequenceDiagram
 | My requests | `requestProvider` | `RequestRepository` | `RequestService.getHistory()` | GET | `/Request/history` | Bearer |
 | Notifications | `notificationProvider` | `NotificationRepository` | `NotificationService.*` | GET/POST | `/Notification/*` | Bearer |
 | Edit profile | — | `AuthRepository` | `AuthService.updateProfile()` | PUT | `/Auth/update-profile` | Bearer |
+| Send OTP (forgot pwd) | `authProvider` | `AuthRepository` | `AuthService.sendOtp()` | POST | `/Auth/send-otp` | No |
+| Verify OTP | `authProvider` | `AuthRepository` | `AuthService.verifyOtp()` | POST | `/Auth/verify-otp` | No |
 | Pharmacy | — | — | `PharmacyService.*` | GET | `/Pharmacy/*` | No |
 | Stats | — | — | `StatsService.getStats()` | GET | `/stats` | No |
 
@@ -93,7 +95,7 @@ sequenceDiagram
 
 - **Notifications & Pharmacy**: The services and repositories exist, but the UI is pending.
 - **Token Expiry**: No `GET /Auth/me` on startup. The app trusts the local token. The backend should handle token validation, but the frontend currently lacks a global 401 interceptor for automatic logout.
-- **Forgot/Change Password**: No endpoints exist yet.
+- **OTP Endpoints**: The OTP verification screen is implemented on the frontend with mock/stub logic. Backend endpoints `POST /Auth/send-otp` and `POST /Auth/verify-otp` are pending implementation. Once ready, update `AuthApiRepository.sendOtp()` and `AuthApiRepository.verifyOtp()` to call the real `AuthService` methods.
 
 ## Related Documentation
 

@@ -7,6 +7,7 @@ import '../../features/auth/providers/auth_provider.dart';
 import '../../features/auth/screens/create_password_screen.dart';
 import '../../features/auth/screens/edit_profile_screen.dart';
 import '../../features/auth/screens/forgot_password_screen.dart';
+import '../../features/auth/screens/otp_verification_screen.dart';
 import '../../features/auth/screens/login_screen.dart';
 import '../../features/auth/screens/profile_screen.dart';
 import '../../features/auth/screens/settings_screen.dart';
@@ -41,6 +42,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           loc == RoutePaths.login ||
           loc == RoutePaths.signUp ||
           loc == RoutePaths.forgotPassword ||
+          loc == RoutePaths.otpVerification ||
           loc == RoutePaths.createPassword;
       if (!isLoggedIn && !isAuthRoute) return RoutePaths.login;
       if (isLoggedIn && isAuthRoute) return RoutePaths.home;
@@ -62,6 +64,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.forgotPassword,
         name: RouteNames.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.otpVerification,
+        name: RouteNames.otpVerification,
+        builder: (context, state) => OtpVerificationScreen(
+          phoneNumber: state.uri.queryParameters['phone'] ?? '',
+        ),
       ),
       GoRoute(
         path: RoutePaths.createPassword,

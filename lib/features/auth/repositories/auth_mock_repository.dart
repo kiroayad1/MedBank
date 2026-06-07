@@ -45,5 +45,17 @@ class AuthMockRepository implements AuthRepository {
   }
 
   @override
+  Future<void> sendOtp({required String phone}) async {
+    await Future.delayed(const Duration(seconds: 1));
+  }
+
+  @override
+  Future<bool> verifyOtp({required String phone, required String code}) async {
+    await Future.delayed(const Duration(seconds: 1));
+    // Accept any 6-digit code except "000000" for testing
+    return code != '000000';
+  }
+
+  @override
   Future<void> logout() async {}
 }

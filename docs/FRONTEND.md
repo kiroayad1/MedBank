@@ -36,7 +36,7 @@ lib/
 │   └── l10n/                      # Localization (ARB files)
 │
 ├── features/                      # Feature modules
-│   ├── auth/                      # Login, register, profile, settings
+│   ├── auth/                      # Login, register, profile, OTP, settings
 │   │   ├── models/
 │   │   ├── providers/
 │   │   ├── screens/

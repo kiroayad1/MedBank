@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/router/route_names.dart';
 import '../../../core/theme/theme.dart';
 import '../../../shared/widgets/app_button.dart';
 import '../../../shared/widgets/app_text_field.dart';
@@ -30,9 +32,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     await Future.delayed(const Duration(seconds: 1));
     setState(() => _isLoading = false);
     if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(context.l10n.verificationSent)));
+      context.pushNamed(
+        RouteNames.otpVerification,
+        queryParameters: {'phone': _phoneController.text},
+      );
     }
   }
 
@@ -110,20 +113,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     isLoading: _isLoading,
                   ),
 
-                  AppSpacing.gapXxxl,
 
-                  // ── Try Another Way ──
-                  Center(
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        l.tryAnotherWay,
-                        style: AppTypography.titleSmall.copyWith(
-                          color: AppColors.accent,
-                        ),
-                      ),
-                    ),
-                  ),
                   AppSpacing.gapXxl,
                 ],
               ),

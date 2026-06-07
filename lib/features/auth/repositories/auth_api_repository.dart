@@ -37,5 +37,18 @@ class AuthApiRepository implements AuthRepository {
   );
 
   @override
+  Future<void> sendOtp({required String phone}) async {
+    // TODO: Call AuthService.instance.sendOtp(phone) when endpoint is ready
+    await Future.delayed(const Duration(seconds: 1));
+  }
+
+  @override
+  Future<bool> verifyOtp({required String phone, required String code}) async {
+    // TODO: Call AuthService.instance.verifyOtp(phone, code) when endpoint is ready
+    await Future.delayed(const Duration(seconds: 1));
+    return code != '000000';
+  }
+
+  @override
   Future<void> logout() => AuthService.instance.logout();
 }

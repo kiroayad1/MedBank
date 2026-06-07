@@ -4,6 +4,7 @@ abstract final class RouteNames {
   static const String login = 'login';
   static const String signUp = 'signUp';
   static const String forgotPassword = 'forgotPassword';
+  static const String otpVerification = 'otpVerification';
   static const String createPassword = 'createPassword';
 
   // MAIN SHELL TABS
@@ -43,6 +44,7 @@ abstract final class RoutePaths {
   static const String login = '/login';
   static const String signUp = '/sign-up';
   static const String forgotPassword = '/forgot-password';
+  static const String otpVerification = '/otp-verification';
   static const String createPassword = '/create-password';
 
   // Main tabs

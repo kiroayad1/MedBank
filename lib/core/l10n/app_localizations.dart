@@ -90,6 +90,23 @@ class S {
     },
     'newPassword': {'en': 'New Password', 'ar': 'كلمة المرور الجديدة'},
 
+    // ── OTP Verification ──
+    'verifyYourNumber': {'en': 'Verify Your Number', 'ar': 'تحقق من رقمك'},
+    'otpSentTo': {
+      'en': 'A 6-digit code was sent to',
+      'ar': 'تم إرسال رمز مكون من 6 أرقام إلى',
+    },
+    'verifyCode': {'en': 'Verify Code', 'ar': 'تحقق من الرمز'},
+    'didntReceiveCode': {
+      'en': "Didn't receive a code?",
+      'ar': 'لم تستلم رمز؟',
+    },
+    'resend': {'en': 'Resend', 'ar': 'إعادة إرسال'},
+    'invalidOtp': {
+      'en': 'Invalid verification code. Please try again.',
+      'ar': 'رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.',
+    },
+
     // ── Browse ──
     'availableMedicines': {
       'en': 'Available Medicines',
@@ -558,6 +575,14 @@ class S {
   String get createNewPassword => _t('createNewPassword');
   String get createPasswordSubtitle => _t('createPasswordSubtitle');
   String get newPassword => _t('newPassword');
+
+  // OTP Verification
+  String get verifyYourNumber => _t('verifyYourNumber');
+  String get otpSentTo => _t('otpSentTo');
+  String get verifyCode => _t('verifyCode');
+  String get didntReceiveCode => _t('didntReceiveCode');
+  String get resend => _t('resend');
+  String get invalidOtp => _t('invalidOtp');
 
   // Browse
   String get availableMedicines => _t('availableMedicines');

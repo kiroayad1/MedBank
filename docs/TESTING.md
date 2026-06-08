@@ -99,29 +99,47 @@ void main() {
 
 ## Widget Testing
 
+When testing screens that depend on routing (`go_router`) or localizations (`AppLocalizations`), you need to wrap your widget in a testable wrapper:
+
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../lib/features/medicine_search/screens/browse_screen.dart';
+import '../../lib/core/l10n/app_localizations.dart';
+import '../../lib/core/theme/theme.dart';
+import '../../lib/features/auth/screens/otp_verification_screen.dart';
 
 void main() {
-  testWidgets('BrowseScreen shows loading then data', (tester) async {
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: MaterialApp(home: BrowseScreen()),
-      ),
+  Widget createTestableWidget({required Widget child}) {
+    final router = GoRouter(
+      initialLocation: '/',
+      routes: [
+        GoRoute(path: '/', builder: (context, state) => child),
+      ],
     );
 
-    // Initially loading
-    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+    return MaterialApp.router(
+      routerConfig: router,
+      theme: AppTheme.light(),
+      localizationsDelegates: const [
+        AppLocalizationsDelegate(),
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [Locale('en')],
+    );
+  }
 
-    // Wait for async data
+  testWidgets('OtpVerificationScreen renders correctly', (tester) async {
+    await tester.pumpWidget(createTestableWidget(
+      child: const OtpVerificationScreen(phoneNumber: '01012345678'),
+    ));
     await tester.pumpAndSettle();
 
-    // Check that medicine list is rendered
-    expect(find.text('Panadol Extra'), findsOneWidget);
+    expect(find.text('Verify Your Number'), findsOneWidget);
+    expect(find.byType(TextField), findsNWidgets(6));
   });
 }
 ```
